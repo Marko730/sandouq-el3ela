@@ -1455,10 +1455,26 @@ function ensureDataIntegrity(obj) {
   if (!obj.settings.cloudUrl) obj.settings.cloudUrl = DEFAULT_FIREBASE_URL;
   if (!obj.settings.fundRoom) obj.settings.fundRoom = 'family_main';
   
-  if (!Array.isArray(obj.members)) obj.members = [];
+  if (obj.members && typeof obj.members === 'object' && !Array.isArray(obj.members)) {
+    obj.members = Object.values(obj.members);
+  } else if (!Array.isArray(obj.members)) {
+    obj.members = [];
+  }
+  
   if (!obj.payments || typeof obj.payments !== 'object' || Array.isArray(obj.payments)) obj.payments = {};
-  if (!Array.isArray(obj.pendingPayments)) obj.pendingPayments = [];
-  if (!Array.isArray(obj.history)) obj.history = [];
+  
+  if (obj.pendingPayments && typeof obj.pendingPayments === 'object' && !Array.isArray(obj.pendingPayments)) {
+    obj.pendingPayments = Object.values(obj.pendingPayments);
+  } else if (!Array.isArray(obj.pendingPayments)) {
+    obj.pendingPayments = [];
+  }
+
+  if (obj.history && typeof obj.history === 'object' && !Array.isArray(obj.history)) {
+    obj.history = Object.values(obj.history);
+  } else if (!Array.isArray(obj.history)) {
+    obj.history = [];
+  }
+
   return obj;
 }
 
@@ -1582,7 +1598,9 @@ async function pullFromCloud(silent = false) {
     return;
   }
   try {
-    const res = await fetch(endpoint);
+    const sep = endpoint.includes('?') ? '&' : '?';
+    const cacheBusterUrl = `${endpoint}${sep}_t=${Date.now()}`;
+    const res = await fetch(cacheBusterUrl, { cache: 'no-store' });
     if (res.ok) {
       const remoteData = await res.json();
       applyRemoteData(remoteData, silent);
@@ -2835,7 +2853,7 @@ initRealtimeSync();
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=12')
+    navigator.serviceWorker.register('sw.js?v=13')
       .then(reg => {
         reg.update();
         console.log('SW registered:', reg.scope);
