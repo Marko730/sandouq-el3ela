@@ -1080,6 +1080,223 @@
       .vf-banner-content { flex-direction: column; text-align: center; }
       .progress-section { flex-direction: column; text-align: center; }
       .member-card { flex-wrap: wrap; }
+      .unified-content { flex-direction: column; text-align: center; }
+      .unified-controls { justify-content: center; width: 100%; }
+    }
+
+    /* ===== ROLE SWITCHER & UNIFIED CARD ===== */
+    .role-badge-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'Cairo';
+      cursor: pointer;
+      border: 1px solid var(--glass-border);
+      background: var(--bg-card-2);
+      color: var(--text-main);
+      transition: all 0.3s;
+    }
+    .role-badge-btn:hover {
+      transform: translateY(-2px);
+    }
+    .role-badge-btn.admin {
+      background: linear-gradient(135deg, rgba(255,192,72,0.2), rgba(255,154,0,0.2));
+      border-color: rgba(255,192,72,0.5);
+      color: var(--warning);
+      box-shadow: 0 2px 10px rgba(255,192,72,0.25);
+    }
+    .role-badge-btn.user {
+      background: linear-gradient(135deg, rgba(102,126,234,0.15), rgba(0,210,255,0.15));
+      border-color: rgba(102,126,234,0.3);
+      color: var(--accent);
+    }
+    .unified-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      animation: fadeUp 0.5s ease 0.12s backwards;
+    }
+    .unified-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .unified-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--grad-1), var(--grad-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    .unified-info { flex: 1; min-width: 180px; }
+    .unified-info h4 { font-size: 15px; font-weight: 800; color: var(--text-bright); margin-bottom: 2px; }
+    .unified-info p { font-size: 11px; color: var(--text-muted); }
+    .unified-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .unified-quick-btns { display: flex; gap: 6px; }
+    .unified-quick-btn {
+      background: var(--bg-card-2);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Cairo';
+      transition: all 0.2s;
+    }
+    .unified-quick-btn:hover {
+      background: var(--grad-1);
+      color: white;
+      border-color: var(--grad-1);
+    }
+    .unified-input {
+      width: 90px;
+      background: var(--bg-card-2);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      text-align: center;
+      font-family: 'Cairo';
+      outline: none;
+    }
+    .unified-input:focus { border-color: var(--accent); }
+    .unified-save-btn {
+      background: linear-gradient(135deg, var(--grad-1), var(--grad-2));
+      color: white;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'Cairo';
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .unified-save-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+    }
+    .unified-badge-val {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--accent);
+    }
+
+    /* ===== SYNC BADGE ===== */
+    .sync-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: var(--bg-card-2);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .sync-badge:hover {
+      border-color: var(--accent);
+      color: var(--text-main);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .status-dot.online {
+      background: #00c9a7;
+      box-shadow: 0 0 8px #00c9a7;
+    }
+    .status-dot.syncing {
+      background: #ffc048;
+      animation: pulse-glow 1s infinite;
+    }
+    .status-dot.offline {
+      background: #ff6b6b;
+    }
+    .status-dot.local {
+      background: #8888aa;
+    }
+
+    /* ===== MEMBER FILTERS ===== */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Cairo';
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid var(--glass-border);
+      background: var(--bg-card-2);
+      color: var(--text-muted);
+    }
+    .filter-btn:hover {
+      transform: translateY(-2px);
+    }
+    .filter-btn.filter-all.active {
+      background: linear-gradient(135deg, var(--grad-1), var(--grad-2));
+      border-color: var(--grad-1);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.35);
+    }
+    .filter-btn.filter-unpaid {
+      background: rgba(255, 107, 107, 0.12);
+      border-color: rgba(255, 107, 107, 0.35);
+      color: #ff6b6b;
+    }
+    .filter-btn.filter-unpaid:hover, .filter-btn.filter-unpaid.active {
+      background: linear-gradient(135deg, #ff6b6b, #ee5253);
+      border-color: #ff6b6b;
+      color: white;
+      box-shadow: 0 4px 18px rgba(255, 107, 107, 0.45);
+    }
+    .filter-btn.filter-paid {
+      background: rgba(0, 201, 167, 0.12);
+      border-color: rgba(0, 201, 167, 0.35);
+      color: #00c9a7;
+    }
+    .filter-btn.filter-paid:hover, .filter-btn.filter-paid.active {
+      background: linear-gradient(135deg, #00c9a7, #10ac84);
+      border-color: #00c9a7;
+      color: white;
+      box-shadow: 0 4px 18px rgba(0, 201, 167, 0.45);
     }
 
     @media print {
@@ -1124,8 +1341,15 @@
         </div>
       </div>
       <div class="header-actions">
+        <!-- Live Sync Indicator -->
+        <div id="syncIndicator" class="sync-badge" onclick="handleSyncBadgeClick()" title="حالة المزامنة السحابية"></div>
+        <!-- Role Switcher -->
+        <button id="roleBtn" class="role-badge-btn user" onclick="handleRoleClick()" title="تبديل الوضع">
+          <span id="roleIcon">👤</span>
+          <span id="roleText">وضع العضو</span>
+        </button>
         <button class="btn-icon" onclick="exportData()" title="تصدير">📤</button>
-        <button class="btn-icon" onclick="document.getElementById('importFile').click()" title="استيراد">📥</button>
+        <button class="btn-icon admin-only" id="btnImport" onclick="document.getElementById('importFile').click()" title="استيراد">📥</button>
         <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)" style="display:none">
         <button class="btn-icon" onclick="window.print()" title="طباعة">🖨️</button>
       </div>
@@ -1149,6 +1373,9 @@
         </div>
       </div>
     </div>
+
+    <!-- ===== UNIFIED MONTHLY AMOUNT CARD ===== -->
+    <div class="unified-card no-print" id="unifiedCard"></div>
 
     <!-- ===== MONTH NAV ===== -->
     <div class="month-nav no-print">
@@ -1199,7 +1426,15 @@ const COLORS = ['#667eea','#00c9a7','#ff6b6b','#ffc048','#00d2ff','#764ba2','#f0
 
 function defaults() {
   return {
-    settings: { fundName:'صندوق العيلة', defaultAmount:100, currency:'ج.م', vfNumber:'' },
+    settings: {
+      fundName: 'صندوق العيلة',
+      defaultAmount: 100,
+      currency: 'ج.م',
+      vfNumber: '',
+      adminPin: '1234',
+      cloudUrl: '',
+      fundRoom: 'family_main'
+    },
     members: [],
     payments: {},
     pendingPayments: [],
@@ -1209,8 +1444,187 @@ function defaults() {
 
 let D = (() => { try { const r = localStorage.getItem(STORAGE); return r ? JSON.parse(r) : defaults(); } catch(e) { return defaults(); } })();
 if (!D.pendingPayments) D.pendingPayments = [];
+if (!D.settings.adminPin) D.settings.adminPin = '1234';
+if (!D.settings.fundRoom) D.settings.fundRoom = 'family_main';
+if (D.settings.cloudUrl === undefined) D.settings.cloudUrl = '';
 
-function save() { localStorage.setItem(STORAGE, JSON.stringify(D)); }
+// Check URL query parameters for auto-configuration from shared link
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('cloud')) {
+  D.settings.cloudUrl = decodeURIComponent(urlParams.get('cloud'));
+  localStorage.setItem(STORAGE, JSON.stringify(D));
+}
+if (urlParams.has('room')) {
+  D.settings.fundRoom = decodeURIComponent(urlParams.get('room'));
+  localStorage.setItem(STORAGE, JSON.stringify(D));
+}
+
+// Role: 'admin' or 'user' (default is user for regular family members)
+let currentRole = localStorage.getItem('family_fund_role') || 'user';
+
+function save(skipCloud = false) {
+  localStorage.setItem(STORAGE, JSON.stringify(D));
+  if (!skipCloud) {
+    pushToCloud();
+  }
+}
+
+// ===================== REAL-TIME CLOUD SYNC =====================
+let syncEventSource = null;
+let syncPollingTimer = null;
+
+function getSyncEndpoint() {
+  let url = (D.settings.cloudUrl || '').trim();
+  if (!url) return null;
+  url = url.replace(/\/+$/, '');
+  const room = (D.settings.fundRoom || 'family_main').trim();
+  if (url.includes('firebaseio.com')) {
+    return `${url}/funds/${room}.json`;
+  }
+  return `${url}/${room}`;
+}
+
+async function pushToCloud() {
+  const endpoint = getSyncEndpoint();
+  if (!endpoint) return;
+  try {
+    updateSyncStatus('syncing');
+    const res = await fetch(endpoint, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(D)
+    });
+    if (res.ok) {
+      updateSyncStatus('online');
+    } else {
+      updateSyncStatus('offline');
+    }
+  } catch (err) {
+    console.error('Cloud push error:', err);
+    updateSyncStatus('offline');
+  }
+}
+
+async function pullFromCloud(silent = false) {
+  const endpoint = getSyncEndpoint();
+  if (!endpoint) {
+    updateSyncStatus('local');
+    return;
+  }
+  try {
+    const res = await fetch(endpoint);
+    if (res.ok) {
+      const remoteData = await res.json();
+      if (remoteData && remoteData.members) {
+        if (JSON.stringify(remoteData) !== JSON.stringify(D)) {
+          D = remoteData;
+          localStorage.setItem(STORAGE, JSON.stringify(D));
+          renderAll();
+          if (!silent) toast('🔄 تم تحديث البيانات فورياً من السحابة', 'info');
+        }
+      }
+      updateSyncStatus('online');
+    } else {
+      updateSyncStatus('offline');
+    }
+  } catch (err) {
+    updateSyncStatus('offline');
+  }
+}
+
+function initRealtimeSync() {
+  const endpoint = getSyncEndpoint();
+  if (!endpoint) {
+    updateSyncStatus('local');
+    return;
+  }
+
+  // 1. Initial pull
+  pullFromCloud(true);
+
+  // 2. Real-time SSE Stream (Firebase Native Realtime)
+  if (endpoint.includes('firebaseio.com')) {
+    if (syncEventSource) {
+      syncEventSource.close();
+      syncEventSource = null;
+    }
+    try {
+      syncEventSource = new EventSource(endpoint);
+      syncEventSource.addEventListener('put', (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg && msg.path === '/' && msg.data && msg.data.members) {
+            if (JSON.stringify(msg.data) !== JSON.stringify(D)) {
+              D = msg.data;
+              localStorage.setItem(STORAGE, JSON.stringify(D));
+              renderAll();
+              toast('🔔 تم تحديث الصندوق لحظياً بواسطة المدير!', 'success');
+            }
+          } else {
+            pullFromCloud(true);
+          }
+          updateSyncStatus('online');
+        } catch (err) {
+          console.error('SSE data parse error:', err);
+        }
+      });
+      syncEventSource.onerror = () => {
+        updateSyncStatus('offline');
+      };
+    } catch (e) {
+      console.error('EventSource connection error:', e);
+    }
+  }
+
+  // 3. Polling fallback (every 3 seconds) for instant cross-device updates
+  if (syncPollingTimer) clearInterval(syncPollingTimer);
+  syncPollingTimer = setInterval(() => {
+    pullFromCloud(true);
+  }, 3000);
+}
+
+function updateSyncStatus(status) {
+  const el = document.getElementById('syncIndicator');
+  if (!el) return;
+  if (status === 'online') {
+    el.innerHTML = '<span class="status-dot online"></span> متزامن لحظياً';
+    el.title = '🟢 المزامنة اللحظية نشطة — أي تعديل من المدير يظهر فوراً';
+  } else if (status === 'syncing') {
+    el.innerHTML = '<span class="status-dot syncing"></span> جاري المزامنة...';
+  } else if (status === 'offline') {
+    el.innerHTML = '<span class="status-dot offline"></span> غير متصل بالسحابة';
+    el.title = '🔴 تعذر الاتصال بقاعدة البيانات السحابية';
+  } else {
+    el.innerHTML = '<span class="status-dot local"></span> محلي (بدون سحابة)';
+    el.title = 'اضغط لربط المزامنة السحابية ومشاركة العائلة';
+  }
+}
+
+function handleSyncBadgeClick() {
+  if (currentRole === 'admin') {
+    switchTab('settings');
+  } else {
+    toast('📡 حالة المزامنة: ' + (D.settings.cloudUrl ? 'متصل بالسحابة وتحديثات المدير تظهر لحظياً' : 'يعمل على الذاكرة المحلية'), 'info');
+  }
+}
+
+function copyFamilyShareLink() {
+  const url = new URL(window.location.href.split('?')[0]);
+  if (D.settings.cloudUrl) {
+    url.searchParams.set('cloud', D.settings.cloudUrl);
+  }
+  if (D.settings.fundRoom) {
+    url.searchParams.set('room', D.settings.fundRoom);
+  }
+  const shareLink = url.toString();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(shareLink).then(() => {
+      toast('📋 تم نسخ رابط العائلة المتزامن جاهزاً للإرسال على واتساب!', 'success');
+    });
+  } else {
+    prompt('انسخ الرابط التالي وشاركه مع العائلة:', shareLink);
+  }
+}
 
 let curMonth = monthKey(new Date());
 function monthKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
@@ -1241,16 +1655,166 @@ function changeMonth(dir) {
 
 function loadMonth() { curMonth = document.getElementById('monthSelect').value; renderAll(); }
 
+// ===================== ROLE & UNIFIED CARD =====================
+function renderRoleBadge() {
+  const btn = document.getElementById('roleBtn');
+  const icon = document.getElementById('roleIcon');
+  const text = document.getElementById('roleText');
+  if (!btn) return;
+  if (currentRole === 'admin') {
+    btn.className = 'role-badge-btn admin';
+    icon.textContent = '👑';
+    text.textContent = 'وضع المدير (إدارة)';
+    btn.title = 'أنت في وضع المدير - اضغط للخروج إلى وضع العضو';
+  } else {
+    btn.className = 'role-badge-btn user';
+    icon.textContent = '👤';
+    text.textContent = 'وضع العضو (عرض)';
+    btn.title = 'أنت في وضع العضو (عرض فقط) - اضغط للدخول كمدير';
+  }
+}
+
+function handleRoleClick() {
+  if (currentRole === 'admin') {
+    currentRole = 'user';
+    localStorage.setItem('family_fund_role', 'user');
+    toast('👤 تم التحويل إلى وضع العضو (استعراض فقط)', 'info');
+    renderAll();
+  } else {
+    showPinModal();
+  }
+}
+
+function showPinModal() {
+  const html = `
+    <div class="modal-overlay" onclick="closeModal(event)">
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-title">🔐 تسجيل دخول المدير</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">أدخل رمز المرور للتحكم في إدارة الأعضاء وتسجيل السداد والإعدادات:</p>
+        <div class="form-group">
+          <input class="form-input" type="password" id="adminPinInput" placeholder="رمز المرور (الافتراضي: 1234)" style="text-align:center; font-size:22px; letter-spacing:4px;">
+        </div>
+        <p style="font-size:11px; color:var(--text-muted); margin-top:-8px; margin-bottom:16px; text-align:center;">الرمز الافتراضي: <b>1234</b> (يمكن تغييره من الإعدادات)</p>
+        <div class="modal-btns">
+          <button class="confirm" onclick="verifyPin()">دخول 👑</button>
+          <button class="cancel" onclick="closeModal()">إلغاء</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalContainer').innerHTML = html;
+  setTimeout(() => {
+    const inp = document.getElementById('adminPinInput');
+    if (inp) {
+      inp.focus();
+      inp.addEventListener('keyup', e => { if (e.key === 'Enter') verifyPin(); });
+    }
+  }, 100);
+}
+
+function verifyPin() {
+  const inp = document.getElementById('adminPinInput');
+  const entered = inp ? inp.value.trim() : '';
+  const correct = D.settings.adminPin || '1234';
+  if (entered === correct) {
+    currentRole = 'admin';
+    localStorage.setItem('family_fund_role', 'admin');
+    closeModal();
+    toast('👑 مرحباً بك يا مدير الصندوق!', 'success');
+    renderAll();
+  } else {
+    toast('❌ رمز المرور غير صحيح', 'error');
+    if (inp) inp.value = '';
+  }
+}
+
+function renderUnifiedCard() {
+  const card = document.getElementById('unifiedCard');
+  if (!card) return;
+  const cur = D.settings.currency;
+  const defAmount = D.settings.defaultAmount || 100;
+
+  if (currentRole === 'admin') {
+    card.innerHTML = `
+      <div class="unified-content">
+        <div class="unified-icon">💵</div>
+        <div class="unified-info">
+          <h4>الاشتراك الشهري الموحد</h4>
+          <p>تغيير السعر يطبّق فوراً على جميع الأعضاء المسجلين (${D.members.length} عضو) والجدد</p>
+        </div>
+        <div class="unified-controls">
+          <div class="unified-quick-btns">
+            <button class="unified-quick-btn" onclick="applyUnifiedAmount(100)">100 ${cur}</button>
+            <button class="unified-quick-btn" onclick="applyUnifiedAmount(150)">150 ${cur}</button>
+            <button class="unified-quick-btn" onclick="applyUnifiedAmount(200)">200 ${cur}</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <input type="number" id="customUnifiedInp" value="${defAmount}" class="unified-input" placeholder="مبلغ">
+            <button class="unified-save-btn" onclick="applyCustomUnified()">تطبيق للجميع ✅</button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    card.innerHTML = `
+      <div class="unified-content">
+        <div class="unified-icon">💵</div>
+        <div class="unified-info">
+          <h4>قيمة الاشتراك الشهري الموحد</h4>
+          <p>المبلغ المطلوب سداده شهرياً لكل فرد في الصندوق</p>
+        </div>
+        <div style="text-align:left;">
+          <span class="unified-badge-val">${defAmount.toLocaleString('ar-EG')}</span>
+          <span style="font-size:13px; color:var(--text-muted);">${cur} / شهرياً</span>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function applyUnifiedAmount(num) {
+  const val = parseFloat(num);
+  if (!val || val <= 0) { toast('⚠️ أدخل مبلغاً صحيحاً', 'error'); return; }
+  D.settings.defaultAmount = val;
+  // Apply to all existing members
+  D.members.forEach(m => { m.amount = val; });
+  save();
+  renderAll();
+  toast(`✅ تم تعميم الاشتراك الموحد (${val} ${D.settings.currency}) على الجميع`, 'success');
+}
+
+function applyCustomUnified() {
+  const inp = document.getElementById('customUnifiedInp');
+  if (inp) applyUnifiedAmount(inp.value);
+}
+
+function updateTabsVisibility() {
+  const tabSet = document.getElementById('tab-settings');
+  const tabHist = document.getElementById('tab-history');
+  const btnImp = document.getElementById('btnImport');
+  if (tabSet) tabSet.style.display = currentRole === 'admin' ? '' : 'none';
+  if (tabHist) tabHist.style.display = currentRole === 'admin' ? '' : 'none';
+  if (btnImp) btnImp.style.display = currentRole === 'admin' ? '' : 'none';
+  // If user was on settings/history, switch to members
+  const curActiveTab = document.querySelector('.tab-btn.active')?.id;
+  if (currentRole === 'user' && (curActiveTab === 'tab-settings' || curActiveTab === 'tab-history')) {
+    switchTab('members');
+  }
+}
+
 // ===================== RENDER =====================
 function renderAll() {
   document.getElementById('headerDate').textContent = monthLabel(curMonth);
+  renderRoleBadge();
   renderVfBanner();
+  renderUnifiedCard();
   renderStats();
   renderProgress();
   renderMembers();
   renderChart();
   renderHistory();
   renderSettings();
+  updateTabsVisibility();
 }
 
 function renderVfBanner() {
@@ -1332,13 +1896,20 @@ function renderProgress() {
   `;
 }
 
+let currentMemberFilter = 'all';
+
+function setMemberFilter(val) {
+  currentMemberFilter = val;
+  renderMembers();
+}
+
 function renderMembers() {
   const mp = D.payments[curMonth] || {};
   const pending = D.pendingPayments.filter(p => p.month === curMonth);
   let html = '';
 
-  // Pending payments section
-  if (pending.length > 0) {
+  // Pending payments section (ADMIN ONLY)
+  if (currentRole === 'admin' && pending.length > 0) {
     html += `
       <div class="pending-section fade-up">
         <div class="pending-title">
@@ -1360,8 +1931,8 @@ function renderMembers() {
                   <div class="member-amount">يطلب تأكيد سداد ${p.amount.toLocaleString('ar-EG')} ${D.settings.currency}</div>
                 </div>
                 <div class="member-actions">
-                  <button class="btn-action approve" onclick="approvePending(${i})" title="قبول">✅</button>
-                  <button class="btn-action reject" onclick="rejectPending(${i})" title="رفض">❌</button>
+                  <button class="btn-action approve" onclick="approvePending(${i})" title="قبول السداد">✅</button>
+                  <button class="btn-action reject" onclick="rejectPending(${i})" title="رفض الطلب">❌</button>
                 </div>
               </div>
             `;
@@ -1374,36 +1945,70 @@ function renderMembers() {
   // Section header
   html += `
     <div class="section-header">
-      <h2 class="section-title">👥 أعضاء الصندوق</h2>
-      <button class="btn-add no-print" onclick="showModal('add')">➕ إضافة عضو</button>
+      <div>
+        <h2 class="section-title">👥 أعضاء الصندوق</h2>
+        ${currentRole === 'user' ? '<p style="font-size:11px; color:var(--text-muted); margin-top:2px;">لوحة الاستعراض — عرض الأعضاء وحالة السداد الشهرية</p>' : ''}
+      </div>
+      ${currentRole === 'admin' ? '<button class="btn-add no-print" onclick="showModal(\'add\')">➕ إضافة عضو</button>' : ''}
     </div>
   `;
 
-  if (D.members.length === 0) {
-    html += `<div class="empty-state fade-up"><div class="icon">👨‍👩‍👧‍👦</div><p>لا يوجد أعضاء بعد — أضف أعضاء العائلة للبدء!</p></div>`;
+  // Filter Buttons in Manager Mode (Red for unpaid, Green for paid, and Show All)
+  if (currentRole === 'admin' && D.members.length > 0) {
+    const paidCount = D.members.filter(m => mp[m.id]?.paid).length;
+    const unpaidCount = D.members.length - paidCount;
+
+    html += `
+      <div class="filter-bar no-print">
+        <button class="filter-btn filter-unpaid ${currentMemberFilter === 'unpaid' ? 'active' : ''}" onclick="setMemberFilter('unpaid')">
+          🔴 لم يسددوا (${unpaidCount})
+        </button>
+        <button class="filter-btn filter-paid ${currentMemberFilter === 'paid' ? 'active' : ''}" onclick="setMemberFilter('paid')">
+          🟢 سددوا فقط (${paidCount})
+        </button>
+        <button class="filter-btn filter-all ${currentMemberFilter === 'all' ? 'active' : ''}" onclick="setMemberFilter('all')">
+          🔘 عرض الكل (${D.members.length})
+        </button>
+      </div>
+    `;
+  }
+
+  // Determine list based on active filter
+  let listToDisplay = D.members;
+  if (currentRole === 'admin') {
+    if (currentMemberFilter === 'paid') {
+      listToDisplay = D.members.filter(m => mp[m.id]?.paid);
+    } else if (currentMemberFilter === 'unpaid') {
+      listToDisplay = D.members.filter(m => !mp[m.id]?.paid);
+    }
+  }
+
+  if (listToDisplay.length === 0) {
+    let emptyMsg = 'لا يوجد أعضاء بعد — أضف أعضاء العائلة للبدء!';
+    let emptyIcon = '👨‍👩‍👧‍👦';
+    if (D.members.length > 0) {
+      if (currentMemberFilter === 'paid') {
+        emptyMsg = 'لا يوجد أعضاء قاموا بالسداد حتى الآن لهذا الشهر ⏳';
+        emptyIcon = '⏳';
+      } else if (currentMemberFilter === 'unpaid') {
+        emptyMsg = 'تم سداد جميع الأعضاء لهذا الشهر بالكامل! 🎉👏';
+        emptyIcon = '🎉';
+      }
+    }
+    html += `<div class="empty-state fade-up"><div class="icon">${emptyIcon}</div><p>${emptyMsg}</p></div>`;
   } else {
     html += '<div class="members-grid">';
-    D.members.forEach((m, i) => {
+    listToDisplay.forEach((m, i) => {
       const pay = mp[m.id];
       const isPaid = pay?.paid;
       const hasPending = D.pendingPayments.some(p => p.memberId === m.id && p.month === curMonth);
       const payDate = isPaid ? new Date(pay.date).toLocaleDateString('ar-EG', { day:'numeric', month:'short' }) : '';
+      const memberAmount = (m.amount || D.settings.defaultAmount);
 
-      html += `
-        <div class="member-card slide-in" style="animation-delay:${i*0.06}s">
-          <div class="member-avatar" style="background: linear-gradient(135deg, ${memberColor(i)}, ${memberColor(i+3)})">
-            ${memberAvatar(i)}
-          </div>
-          <div class="member-info">
-            <div class="member-name">${m.name}</div>
-            <div class="member-amount">${m.amount.toLocaleString('ar-EG')} ${D.settings.currency} / شهرياً</div>
-          </div>
-          <div class="member-status">
-            <span class="badge ${isPaid ? 'badge-paid' : hasPending ? 'badge-pending' : 'badge-unpaid'}">
-              ${isPaid ? '✅ تم السداد' : hasPending ? '⏳ في الانتظار' : '⏳ لم يسدد'}
-            </span>
-            ${payDate ? `<span class="pay-date">${payDate}</span>` : ''}
-          </div>
+      // Actions depending on currentRole
+      let actionsHtml = '';
+      if (currentRole === 'admin') {
+        actionsHtml = `
           <div class="member-actions no-print">
             ${isPaid
               ? `<button class="btn-action undo" onclick="cancelPayment('${m.id}')" title="إلغاء السداد">↩️</button>`
@@ -1412,9 +2017,40 @@ function renderMembers() {
                 : `<button class="btn-action pay" onclick="showModal('pay','${m.id}')" title="تسجيل سداد">💵</button>
                    <button class="btn-action" style="font-size:12px;" onclick="sendPendingPayment('${m.id}')" title="أرسلت فودافون كاش">📱</button>`
             }
-            <button class="btn-action edit" onclick="showModal('edit','${m.id}')" title="تعديل">✏️</button>
+            <button class="btn-action edit" onclick="showModal('edit','${m.id}')" title="تعديل الاسم">✏️</button>
             <button class="btn-action delete" onclick="removeMember('${m.id}')" title="حذف">🗑️</button>
           </div>
+        `;
+      } else {
+        // User Mode: Read-only, cannot confirm payment, cannot edit/delete
+        actionsHtml = `
+          <div class="member-actions no-print">
+            ${isPaid
+              ? ''
+              : hasPending
+                ? '<span style="font-size:11px; color:var(--warning); font-weight:700;">طلبك قيد المراجعة ⏳</span>'
+                : `<button class="btn-action" style="width:auto; padding:0 12px; font-size:11px; gap:4px; font-weight:700;" onclick="sendPendingPayment('${m.id}')" title="إشعار للمدير بالتحويل">📱 أرسلت فودافون كاش</button>`
+            }
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="member-card slide-in" style="animation-delay:${i*0.06}s">
+          <div class="member-avatar" style="background: linear-gradient(135deg, ${memberColor(i)}, ${memberColor(i+3)})">
+            ${memberAvatar(i)}
+          </div>
+          <div class="member-info">
+            <div class="member-name">${m.name}</div>
+            <div class="member-amount">${memberAmount.toLocaleString('ar-EG')} ${D.settings.currency} / شهرياً</div>
+          </div>
+          <div class="member-status">
+            <span class="badge ${isPaid ? 'badge-paid' : hasPending ? 'badge-pending' : 'badge-unpaid'}">
+              ${isPaid ? '✅ تم السداد' : hasPending ? '⏳ في الانتظار' : '⏳ لم يسدد'}
+            </span>
+            ${payDate ? `<span class="pay-date">${payDate}</span>` : ''}
+          </div>
+          ${actionsHtml}
         </div>
       `;
     });
@@ -1557,8 +2193,9 @@ function renderSettings() {
         <input class="form-input" id="setName" value="${D.settings.fundName}">
       </div>
       <div class="form-group">
-        <label class="form-label">المبلغ الشهري الافتراضي</label>
+        <label class="form-label">قيمة الاشتراك الشهري الموحد للجميع</label>
         <input class="form-input" type="number" id="setAmount" value="${D.settings.defaultAmount}">
+        <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">تغيير هذا المبلغ سيطبّق تلقائياً على جميع الأعضاء المسجلين والجدد.</p>
       </div>
       <div class="form-group">
         <label class="form-label">العملة</label>
@@ -1572,12 +2209,66 @@ function renderSettings() {
         <input class="form-input" id="setVfNumber" placeholder="مثال: 01012345678" value="${D.settings.vfNumber||''}" style="direction:ltr; text-align:center; font-size:18px; letter-spacing:2px;">
         <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">أدخل رقم فودافون كاش لاستقبال المدفوعات. سيظهر في بانر أعلى الصفحة.</p>
       </div>
+      <div class="form-group" style="padding-top:16px; border-top:1px solid var(--glass-border);">
+        <label class="form-label" style="color:var(--warning);">🔐 رمز مرور لوحة المدير (PIN)</label>
+        <input class="form-input" id="setAdminPin" value="${D.settings.adminPin||'1234'}" placeholder="مثال: 1234" style="text-align:center; font-size:18px; letter-spacing:3px;">
+        <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">الرمز المستخدم لحماية لوحة الإدارة ومنع الأعضاء العاديين من تأكيد السداد لأنفسهم.</p>
+      </div>
+
+      <!-- Cloud Realtime Sync Section -->
+      <div class="form-group" style="padding-top:16px; border-top:1px solid var(--glass-border);">
+        <label class="form-label" style="color:var(--accent); font-size:14px; font-weight:800;">
+          ☁️ المزامنة السحابية اللحظية (Real-Time Cloud Sync)
+        </label>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">
+          لربط هواتف جميع أفراد العائلة بحيث تظهر تحديثاتك فوراً على شاشاتهم في نفس اللحظة:
+        </p>
+
+        <label class="form-label">رابط قاعدة بيانات Firebase (Realtime Database)</label>
+        <input class="form-input" id="setCloudUrl" placeholder="https://your-project-default-rtdb.firebaseio.com" value="${D.settings.cloudUrl||''}" style="direction:ltr; text-align:left; font-family:monospace; font-size:12px;">
+        
+        <label class="form-label" style="margin-top:10px;">كود غرفة الصندوق (Fund ID)</label>
+        <input class="form-input" id="setFundRoom" placeholder="مثال: family-fund-2026" value="${D.settings.fundRoom||'family_main'}" style="direction:ltr; text-align:center; font-weight:bold; font-size:14px;">
+
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button class="btn-save" type="button" style="flex:1; background:linear-gradient(135deg, var(--accent), #00a8ff); font-size:12px; padding:10px;" onclick="copyFamilyShareLink()">
+            🔗 نسخ رابط العائلة المتزامن (للواتساب)
+          </button>
+        </div>
+
+        <div style="background:rgba(0,210,255,0.06); border:1px solid rgba(0,210,255,0.2); border-radius:12px; padding:12px; margin-top:12px; font-size:11px; line-height:1.7; color:var(--text-main);">
+          💡 <b>كيف تشغل المزامنة في خطوتين (مجانية للأبد):</b><br>
+          1. ادخل على <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent); font-weight:bold;">Firebase Console</a> وأنشئ مشروعاً مجانياً.<br>
+          2. اضغط <b>Build</b> ثم <b>Realtime Database</b> واضغط <b>Create Database</b> واجعل القواعد <code>".read": true, ".write": true</code>.<br>
+          3. انسخ رابط الداتابيز (ينتهي بـ <code>firebaseio.com</code>) والصقه في الخانة أعلاه واضغط حفظ. كده أي تعديل تعمله هيظهر عند كل العيلة فوراً بدون أي تأخير!
+        </div>
+      </div>
+
       <div style="display:flex; gap:12px; margin-top:20px; flex-wrap:wrap;">
         <button class="btn-save" onclick="saveSettings()">💾 حفظ الإعدادات</button>
         <button class="btn-danger" onclick="confirmReset()">🗑️ مسح جميع البيانات</button>
       </div>
     </div>
   `;
+}
+
+function saveSettings() {
+  D.settings.fundName = document.getElementById('setName').value.trim() || 'صندوق العيلة';
+  const newAmount = parseFloat(document.getElementById('setAmount').value) || 100;
+  if (newAmount !== D.settings.defaultAmount) {
+    D.settings.defaultAmount = newAmount;
+    D.members.forEach(m => { m.amount = newAmount; });
+  }
+  D.settings.currency = document.getElementById('setCurrency').value;
+  D.settings.vfNumber = document.getElementById('setVfNumber').value.trim();
+  D.settings.adminPin = document.getElementById('setAdminPin').value.trim() || '1234';
+  D.settings.cloudUrl = document.getElementById('setCloudUrl').value.trim();
+  D.settings.fundRoom = document.getElementById('setFundRoom').value.trim() || 'family_main';
+  save();
+  initRealtimeSync();
+  renderAll();
+  document.getElementById('headerTitle').textContent = D.settings.fundName;
+  toast('✅ تم حفظ الإعدادات وربط المزامنة السحابية', 'success');
 }
 
 // ===================== ACTIONS =====================
@@ -1592,12 +2283,12 @@ function showModal(type, memberId) {
             <label class="form-label">اسم العضو</label>
             <input class="form-input" id="mName" placeholder="مثال: أحمد محمد">
           </div>
-          <div class="form-group">
-            <label class="form-label">المبلغ الشهري (${D.settings.currency})</label>
-            <input class="form-input" type="number" id="mAmount" value="${D.settings.defaultAmount}">
+          <div style="background:var(--bg-card-2); border-radius:12px; padding:12px 16px; margin-bottom:14px; font-size:13px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
+            <span>الاشتراك الشهري الموحد:</span>
+            <b style="color:var(--accent); font-size:15px;">${(D.settings.defaultAmount || 100).toLocaleString('ar-EG')} ${D.settings.currency}</b>
           </div>
           <div class="modal-btns">
-            <button class="confirm" onclick="addMember()">إضافة ✅</button>
+            <button class="confirm" onclick="addMember()">إضافة العضو ✅</button>
             <button class="cancel" onclick="closeModal()">إلغاء</button>
           </div>
         </div>
@@ -1616,7 +2307,7 @@ function showModal(type, memberId) {
           </div>
           <div class="form-group">
             <label class="form-label">المبلغ المدفوع (${D.settings.currency})</label>
-            <input class="form-input" type="number" id="payAmount" value="${m.amount}">
+            <input class="form-input" type="number" id="payAmount" value="${m.amount || D.settings.defaultAmount}">
           </div>
           <div class="form-group">
             <label class="form-label">ملاحظات (اختياري)</label>
@@ -1634,18 +2325,14 @@ function showModal(type, memberId) {
     html = `
       <div class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-box" onclick="event.stopPropagation()">
-          <div class="modal-title">✏️ تعديل بيانات العضو</div>
+          <div class="modal-title">✏️ تعديل اسم العضو</div>
           <input type="hidden" id="editId" value="${memberId}">
           <div class="form-group">
             <label class="form-label">اسم العضو</label>
             <input class="form-input" id="editName" value="${m.name}">
           </div>
-          <div class="form-group">
-            <label class="form-label">المبلغ الشهري (${D.settings.currency})</label>
-            <input class="form-input" type="number" id="editAmount" value="${m.amount}">
-          </div>
           <div class="modal-btns">
-            <button class="confirm" onclick="saveEdit()">حفظ ✅</button>
+            <button class="confirm" onclick="saveEdit()">حفظ التعديل ✅</button>
             <button class="cancel" onclick="closeModal()">إلغاء</button>
           </div>
         </div>
@@ -1663,12 +2350,21 @@ function closeModal(e) {
 
 function addMember() {
   const name = document.getElementById('mName').value.trim();
-  const amount = parseFloat(document.getElementById('mAmount').value) || D.settings.defaultAmount;
   if (!name) { toast('⚠️ أدخل اسم العضو', 'error'); return; }
+  const amount = parseFloat(D.settings.defaultAmount) || 100;
   D.members.push({ id:'m'+Date.now(), name, amount });
   D.history.unshift({ date:new Date().toISOString(), action:'add_member', member:name, amount, month:curMonth });
   save(); closeModal(); renderAll();
-  toast(`✅ تمت إضافة ${name}`, 'success');
+  toast(`✅ تمت إضافة ${name} بقيمة ${amount} ${D.settings.currency}`, 'success');
+}
+
+function saveEdit() {
+  const id = document.getElementById('editId').value;
+  const m = D.members.find(x => x.id === id);
+  if (!m) return;
+  m.name = document.getElementById('editName').value.trim();
+  save(); closeModal(); renderAll();
+  toast('✅ تم حفظ التعديل', 'success');
 }
 
 function recordPayment() {
@@ -1956,6 +2652,7 @@ function toast(msg, type='info') {
 // ===================== INIT =====================
 initMonths();
 renderAll();
+initRealtimeSync();
 
 // ===================== PWA =====================
 // Register Service Worker
