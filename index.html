@@ -1694,7 +1694,11 @@ function showPinModal() {
         <div class="form-group">
           <input class="form-input" type="password" id="adminPinInput" placeholder="رمز المرور (الافتراضي: 1234)" style="text-align:center; font-size:22px; letter-spacing:4px;">
         </div>
-        <p style="font-size:11px; color:var(--text-muted); margin-top:-8px; margin-bottom:16px; text-align:center;">الرمز الافتراضي: <b>1234</b> (يمكن تغييره من الإعدادات)</p>
+        <p style="font-size:11px; color:var(--text-muted); margin-top:-8px; margin-bottom:16px; text-align:center;">
+          الرمز الافتراضي: <b>1234</b> (يمكن تغييره من الإعدادات)
+          <br>
+          <a href="javascript:void(0)" onclick="resetAdminPinToDefault()" style="color:var(--accent); text-decoration:underline; font-size:11px; display:inline-block; margin-top:6px;">نسيت الرمز؟ اضغط هنا لاستعادة (1234)</a>
+        </p>
         <div class="modal-btns">
           <button class="confirm" onclick="verifyPin()">دخول 👑</button>
           <button class="cancel" onclick="closeModal()">إلغاء</button>
@@ -1712,10 +1716,41 @@ function showPinModal() {
   }, 100);
 }
 
+function getAdminPin() {
+  return localStorage.getItem('family_fund_pin') || D.settings.adminPin || '1234';
+}
+
+function setAdminPin(pin) {
+  const p = (pin || '1234').trim();
+  localStorage.setItem('family_fund_pin', p);
+  D.settings.adminPin = p;
+  save();
+}
+
+function changeAdminPinDirectly() {
+  const inp = document.getElementById('setAdminPin');
+  const val = inp ? inp.value.trim() : '';
+  if (!val) {
+    toast('⚠️ الرجاء إدخال رمز مرور صالح', 'error');
+    return;
+  }
+  setAdminPin(val);
+  toast(`✅ تم تغيير رمز مرور المدير بنجاح إلى: (${val})`, 'success');
+}
+
+function resetAdminPinToDefault() {
+  if (confirm('هل ترغب في استعادة رمز مرور المدير الافتراضي (1234)؟')) {
+    setAdminPin('1234');
+    toast('✅ تم إعادة تعيين الرمز إلى الافتراضي: 1234', 'success');
+    const inp = document.getElementById('adminPinInput');
+    if (inp) inp.value = '1234';
+  }
+}
+
 function verifyPin() {
   const inp = document.getElementById('adminPinInput');
   const entered = inp ? inp.value.trim() : '';
-  const correct = D.settings.adminPin || '1234';
+  const correct = getAdminPin();
   if (entered === correct) {
     currentRole = 'admin';
     localStorage.setItem('family_fund_role', 'admin');
@@ -1953,34 +1988,30 @@ function renderMembers() {
     </div>
   `;
 
-  // Filter Buttons in Manager Mode (Red for unpaid, Green for paid, and Show All)
-  if (currentRole === 'admin' && D.members.length > 0) {
-    const paidCount = D.members.filter(m => mp[m.id]?.paid).length;
-    const unpaidCount = D.members.length - paidCount;
+  // Filter Buttons (Always visible: Red for unpaid, Green for paid, and Show All)
+  const paidCount = D.members.filter(m => mp[m.id]?.paid).length;
+  const unpaidCount = D.members.length - paidCount;
 
-    html += `
-      <div class="filter-bar no-print">
-        <button class="filter-btn filter-unpaid ${currentMemberFilter === 'unpaid' ? 'active' : ''}" onclick="setMemberFilter('unpaid')">
-          🔴 لم يسددوا (${unpaidCount})
-        </button>
-        <button class="filter-btn filter-paid ${currentMemberFilter === 'paid' ? 'active' : ''}" onclick="setMemberFilter('paid')">
-          🟢 سددوا فقط (${paidCount})
-        </button>
-        <button class="filter-btn filter-all ${currentMemberFilter === 'all' ? 'active' : ''}" onclick="setMemberFilter('all')">
-          🔘 عرض الكل (${D.members.length})
-        </button>
-      </div>
-    `;
-  }
+  html += `
+    <div class="filter-bar no-print">
+      <button class="filter-btn filter-unpaid ${currentMemberFilter === 'unpaid' ? 'active' : ''}" onclick="setMemberFilter('unpaid')">
+        🔴 لم يسددوا (${unpaidCount})
+      </button>
+      <button class="filter-btn filter-paid ${currentMemberFilter === 'paid' ? 'active' : ''}" onclick="setMemberFilter('paid')">
+        🟢 سددوا فقط (${paidCount})
+      </button>
+      <button class="filter-btn filter-all ${currentMemberFilter === 'all' ? 'active' : ''}" onclick="setMemberFilter('all')">
+        🔘 عرض الكل (${D.members.length})
+      </button>
+    </div>
+  `;
 
   // Determine list based on active filter
   let listToDisplay = D.members;
-  if (currentRole === 'admin') {
-    if (currentMemberFilter === 'paid') {
-      listToDisplay = D.members.filter(m => mp[m.id]?.paid);
-    } else if (currentMemberFilter === 'unpaid') {
-      listToDisplay = D.members.filter(m => !mp[m.id]?.paid);
-    }
+  if (currentMemberFilter === 'paid') {
+    listToDisplay = D.members.filter(m => mp[m.id]?.paid);
+  } else if (currentMemberFilter === 'unpaid') {
+    listToDisplay = D.members.filter(m => !mp[m.id]?.paid);
   }
 
   if (listToDisplay.length === 0) {
@@ -2210,8 +2241,13 @@ function renderSettings() {
         <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">أدخل رقم فودافون كاش لاستقبال المدفوعات. سيظهر في بانر أعلى الصفحة.</p>
       </div>
       <div class="form-group" style="padding-top:16px; border-top:1px solid var(--glass-border);">
-        <label class="form-label" style="color:var(--warning);">🔐 رمز مرور لوحة المدير (PIN)</label>
-        <input class="form-input" id="setAdminPin" value="${D.settings.adminPin||'1234'}" placeholder="مثال: 1234" style="text-align:center; font-size:18px; letter-spacing:3px;">
+        <label class="form-label" style="color:var(--warning); font-size:14px; font-weight:800;">🔐 رمز مرور لوحة المدير (PIN)</label>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:6px;">
+          <input class="form-input" id="setAdminPin" value="${getAdminPin()}" placeholder="مثال: 1234" style="text-align:center; font-size:18px; letter-spacing:4px; max-width:180px;">
+          <button type="button" class="btn-save" style="padding:10px 18px; font-size:13px; font-weight:bold; background:linear-gradient(135deg, var(--warning), #ff9a00); color:#000;" onclick="changeAdminPinDirectly()">
+            تغيير الرمز 🔒
+          </button>
+        </div>
         <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">الرمز المستخدم لحماية لوحة الإدارة ومنع الأعضاء العاديين من تأكيد السداد لأنفسهم.</p>
       </div>
 
@@ -2261,7 +2297,8 @@ function saveSettings() {
   }
   D.settings.currency = document.getElementById('setCurrency').value;
   D.settings.vfNumber = document.getElementById('setVfNumber').value.trim();
-  D.settings.adminPin = document.getElementById('setAdminPin').value.trim() || '1234';
+  const newPin = (document.getElementById('setAdminPin')?.value || '').trim() || '1234';
+  setAdminPin(newPin);
   D.settings.cloudUrl = document.getElementById('setCloudUrl').value.trim();
   D.settings.fundRoom = document.getElementById('setFundRoom').value.trim() || 'family_main';
   save();
@@ -2658,7 +2695,7 @@ initRealtimeSync();
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
+    navigator.serviceWorker.register('sw.js?v=7')
       .then(reg => {
         reg.update();
         console.log('SW registered:', reg.scope);
