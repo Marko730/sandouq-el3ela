@@ -1450,12 +1450,14 @@ if (D.settings.cloudUrl === undefined) D.settings.cloudUrl = '';
 
 // Check URL query parameters for auto-configuration from shared link
 const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has('cloud')) {
-  D.settings.cloudUrl = decodeURIComponent(urlParams.get('cloud'));
+const cloudParam = (urlParams.get('cloud') || '').trim();
+if (cloudParam) {
+  D.settings.cloudUrl = decodeURIComponent(cloudParam);
   localStorage.setItem(STORAGE, JSON.stringify(D));
 }
-if (urlParams.has('room')) {
-  D.settings.fundRoom = decodeURIComponent(urlParams.get('room'));
+const roomParam = (urlParams.get('room') || '').trim();
+if (roomParam) {
+  D.settings.fundRoom = decodeURIComponent(roomParam);
   localStorage.setItem(STORAGE, JSON.stringify(D));
 }
 
@@ -1476,17 +1478,40 @@ let syncPollingTimer = null;
 function getSyncEndpoint() {
   let url = (D.settings.cloudUrl || '').trim();
   if (!url) return null;
-  url = url.replace(/\/+$/, '');
+
+  // Auto-convert Firebase Console URL if pasted by mistake
+  if (url.includes('console.firebase.google.com')) {
+    const match = url.match(/database\/([^\/\?]+)/);
+    if (match && match[1]) {
+      url = `https://${match[1]}.firebaseio.com`;
+    }
+  }
+
+  // Ensure protocol
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url;
+  }
+
+  // Clean trailing slashes and existing .json
+  url = url.replace(/\/+$/, '').replace(/\.json$/, '');
   const room = (D.settings.fundRoom || 'family_main').trim();
-  if (url.includes('firebaseio.com')) {
+
+  // If already contains /funds/
+  if (url.includes('/funds/')) {
+    return `${url}.json`;
+  }
+
+  // Firebase Realtime Database: either firebaseio.com or firebasedatabase.app
+  if (url.includes('firebaseio.com') || url.includes('firebasedatabase.app')) {
     return `${url}/funds/${room}.json`;
   }
-  return `${url}/${room}`;
+
+  return `${url}/${room}.json`;
 }
 
 async function pushToCloud() {
   const endpoint = getSyncEndpoint();
-  if (!endpoint) return;
+  if (!endpoint) return false;
   try {
     updateSyncStatus('syncing');
     const res = await fetch(endpoint, {
@@ -1496,12 +1521,21 @@ async function pushToCloud() {
     });
     if (res.ok) {
       updateSyncStatus('online');
+      return true;
     } else {
       updateSyncStatus('offline');
+      if (res.status === 401) {
+        toast('⚠️ قاعدة بيانات Firebase ترفض الكتابة (Permission Denied). ادخل على تبويب Rules واجعل read: true و write: true', 'error');
+      } else {
+        toast(`⚠️ تعذر الحفظ في Firebase (خطأ ${res.status})`, 'error');
+      }
+      return false;
     }
   } catch (err) {
     console.error('Cloud push error:', err);
     updateSyncStatus('offline');
+    toast('⚠️ تعذر الاتصال بـ Firebase: تأكد من صحة الرابط أو جرب بدون بروكسي', 'error');
+    return false;
   }
 }
 
@@ -1555,7 +1589,7 @@ function initRealtimeSync() {
   pullFromCloud(true);
 
   // 2. Real-time SSE Stream (Firebase Native Realtime)
-  if (endpoint.includes('firebaseio.com')) {
+  if (endpoint.includes('firebaseio.com') || endpoint.includes('firebasedatabase.app')) {
     if (syncEventSource) {
       syncEventSource.close();
       syncEventSource = null;
@@ -1699,7 +1733,7 @@ function showPinModal() {
         <div class="modal-title">🔐 تسجيل دخول المدير</div>
         <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">أدخل رمز المرور للتحكم في إدارة الأعضاء وتسجيل السداد والإعدادات:</p>
         <div class="form-group">
-          <input class="form-input" type="password" id="adminPinInput" placeholder="رمز المرور (الافتراضي: 1234)" style="text-align:center; font-size:22px; letter-spacing:4px;">
+          <input class="form-input" type="password" id="adminPinInput" placeholder="" autocomplete="off" style="text-align:center; font-size:22px; letter-spacing:4px;">
         </div>
         <p style="font-size:11px; color:var(--text-muted); margin-top:-8px; margin-bottom:16px; text-align:center;">
           الرمز الافتراضي: <b>1234</b> (يمكن تغييره من الإعدادات)
@@ -2250,7 +2284,7 @@ function renderSettings() {
       <div class="form-group" style="padding-top:16px; border-top:1px solid var(--glass-border);">
         <label class="form-label" style="color:var(--warning); font-size:14px; font-weight:800;">🔐 رمز مرور لوحة المدير (PIN)</label>
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:6px;">
-          <input class="form-input" id="setAdminPin" value="${getAdminPin()}" placeholder="مثال: 1234" style="text-align:center; font-size:18px; letter-spacing:4px; max-width:180px;">
+          <input class="form-input" id="setAdminPin" value="${getAdminPin()}" placeholder="" autocomplete="off" style="text-align:center; font-size:18px; letter-spacing:4px; max-width:180px;">
           <button type="button" class="btn-save" style="padding:10px 18px; font-size:13px; font-weight:bold; background:linear-gradient(135deg, var(--warning), #ff9a00); color:#000;" onclick="changeAdminPinDirectly()">
             تغيير الرمز 🔒
           </button>
@@ -2273,17 +2307,22 @@ function renderSettings() {
         <label class="form-label" style="margin-top:10px;">كود غرفة الصندوق (Fund ID)</label>
         <input class="form-input" id="setFundRoom" placeholder="مثال: family-fund-2026" value="${D.settings.fundRoom||'family_main'}" style="direction:ltr; text-align:center; font-weight:bold; font-size:14px;">
 
-        <div style="display:flex; gap:8px; margin-top:12px;">
-          <button class="btn-save" type="button" style="flex:1; background:linear-gradient(135deg, var(--accent), #00a8ff); font-size:12px; padding:10px;" onclick="copyFamilyShareLink()">
+        <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+          <button type="button" class="btn-save" style="flex:1; background:linear-gradient(135deg, #10ac84, #00c9a7); font-size:12px; padding:10px 14px;" onclick="testFirebaseConnection()">
+            ⚡ اختبار الاتصال بـ Firebase الآن
+          </button>
+          <button class="btn-save" type="button" style="flex:1; background:linear-gradient(135deg, var(--accent), #00a8ff); font-size:12px; padding:10px 14px;" onclick="copyFamilyShareLink()">
             🔗 نسخ رابط العائلة المتزامن (للواتساب)
           </button>
         </div>
 
-        <div style="background:rgba(0,210,255,0.06); border:1px solid rgba(0,210,255,0.2); border-radius:12px; padding:12px; margin-top:12px; font-size:11px; line-height:1.7; color:var(--text-main);">
-          💡 <b>كيف تشغل المزامنة في خطوتين (مجانية للأبد):</b><br>
-          1. ادخل على <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent); font-weight:bold;">Firebase Console</a> وأنشئ مشروعاً مجانياً.<br>
-          2. اضغط <b>Build</b> ثم <b>Realtime Database</b> واضغط <b>Create Database</b> واجعل القواعد <code>".read": true, ".write": true</code>.<br>
-          3. انسخ رابط الداتابيز (ينتهي بـ <code>firebaseio.com</code>) والصقه في الخانة أعلاه واضغط حفظ. كده أي تعديل تعمله هيظهر عند كل العيلة فوراً بدون أي تأخير!
+        <div style="background:rgba(0,210,255,0.06); border:1px solid rgba(0,210,255,0.2); border-radius:12px; padding:14px; margin-top:14px; font-size:12px; line-height:1.8; color:var(--text-main);">
+          💡 <b>كيف تشغل المزامنة اللحظية في 3 خطوات بسيطة:</b><br>
+          1️⃣ ادخل على <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent); font-weight:bold;">Firebase Console</a> وأنشئ مشروعاً مجانياً.<br>
+          2️⃣ اضغط <b>Build</b> ثم <b>Realtime Database</b> واضغط <b>Create Database</b>.<br>
+          3️⃣ ⚠️ <b>الخطوة الأهم (Rules):</b> ادخل على تبويب <b>Rules (القواعد)</b> وضع الكود التالي ثم اضغط <b>Publish</b>:<br>
+          <pre style="background:rgba(0,0,0,0.4); padding:8px 12px; border-radius:8px; margin:6px 0; font-family:monospace; direction:ltr; text-align:left; color:#00e5a0; font-size:13px;">{ "rules": { ".read": true, ".write": true } }</pre>
+          4️⃣ انسخ الرابط الموجود أعلى الداتابيز (ينتهي بـ <code>firebaseio.com</code> أو <code>firebasedatabase.app</code>) والصقه في الخانة أعلاه واضغط <b>اختبار الاتصال</b>.
         </div>
       </div>
 
@@ -2295,7 +2334,60 @@ function renderSettings() {
   `;
 }
 
-function saveSettings() {
+async function testFirebaseConnection() {
+  const urlInp = document.getElementById('setCloudUrl');
+  let url = urlInp ? urlInp.value.trim() : '';
+  if (!url) {
+    toast('⚠️ يرجى إدخال رابط Firebase أولاً', 'error');
+    return;
+  }
+  
+  if (url.includes('console.firebase.google.com')) {
+    const match = url.match(/database\/([^\/\?]+)/);
+    if (match && match[1]) {
+      url = `https://${match[1]}.firebaseio.com`;
+      if (urlInp) urlInp.value = url;
+      toast('💡 تم تصحيح الرابط تلقائياً إلى رابط قاعدة البيانات المباشر', 'info');
+    }
+  }
+
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url;
+    if (urlInp) urlInp.value = url;
+  }
+  
+  D.settings.cloudUrl = url.replace(/\/+$/, '').replace(/\.json$/, '');
+  const room = (document.getElementById('setFundRoom')?.value || 'family_main').trim();
+  D.settings.fundRoom = room;
+  save();
+
+  toast('⏳ جاري اختبار الاتصال بقاعدة بيانات Firebase...', 'info');
+  const endpoint = getSyncEndpoint();
+  try {
+    const res = await fetch(endpoint, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(D)
+    });
+    if (res.ok) {
+      toast('🎉 متصل بنجاح! تم حفظ البيانات في Firebase والمزامنة تعمل بشكل ممتاز!', 'success');
+      updateSyncStatus('online');
+      initRealtimeSync();
+      renderAll();
+    } else if (res.status === 401) {
+      toast('❌ فشل الاتصال: القواعد ترفض الكتابة (401 Permission Denied)! ادخل على Rules في Firebase واجعل read: true و write: true', 'error');
+      updateSyncStatus('offline');
+    } else {
+      toast(`❌ فشل الاتصال: كود الخطأ (${res.status}). تأكد من صحة الرابط`, 'error');
+      updateSyncStatus('offline');
+    }
+  } catch (err) {
+    toast('❌ تعذر الاتصال بـ Firebase: تأكد من الرابط أو اتصال الإنترنت', 'error');
+    updateSyncStatus('offline');
+  }
+}
+
+async function saveSettings() {
   D.settings.fundName = document.getElementById('setName').value.trim() || 'صندوق العيلة';
   const newAmount = parseFloat(document.getElementById('setAmount').value) || 100;
   if (newAmount !== D.settings.defaultAmount) {
@@ -2309,6 +2401,12 @@ function saveSettings() {
   setAdminPin(newPin);
   
   let cloudUrlVal = (document.getElementById('setCloudUrl')?.value || '').trim();
+  if (cloudUrlVal.includes('console.firebase.google.com')) {
+    const match = cloudUrlVal.match(/database\/([^\/\?]+)/);
+    if (match && match[1]) {
+      cloudUrlVal = `https://${match[1]}.firebaseio.com`;
+    }
+  }
   if (cloudUrlVal && !cloudUrlVal.startsWith('http://') && !cloudUrlVal.startsWith('https://')) {
     cloudUrlVal = 'https://' + cloudUrlVal;
   }
@@ -2320,7 +2418,16 @@ function saveSettings() {
   initRealtimeSync();
   renderAll();
   document.getElementById('headerTitle').textContent = D.settings.fundName;
-  toast('✅ تم حفظ الإعدادات ورمز المرور ورابط المزامنة بنجاح!', 'success');
+  
+  if (D.settings.cloudUrl) {
+    toast('💾 جاري اختبار وحفظ البيانات على Firebase...', 'info');
+    const ok = await pushToCloud();
+    if (ok) {
+      toast('✅ تم حفظ الإعدادات ورفع كافة بيانات الصندوق إلى Firebase بنجاح!', 'success');
+    }
+  } else {
+    toast('✅ تم حفظ الإعدادات محلياً بنجاح!', 'success');
+  }
 }
 
 // ===================== ACTIONS =====================
@@ -2702,7 +2809,7 @@ initRealtimeSync();
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=8')
+    navigator.serviceWorker.register('sw.js?v=10')
       .then(reg => {
         reg.update();
         console.log('SW registered:', reg.scope);
