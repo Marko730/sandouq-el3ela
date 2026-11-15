@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>صندوق العيلة 💰</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="صندوق العيلة">
+  <meta name="description" content="تطبيق إدارة صندوق العائلة - تتبع المدفوعات والتحصيل الشهري">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="msapplication-TileColor" content="#667eea">
+  <meta name="msapplication-TileImage" content="icons/icon-144.png">
+
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap');
+
+    :root {
+      --grad-1: #667eea;
+      --grad-2: #764ba2;
+      --grad-3: #f093fb;
+      --accent: #00d2ff;
+      --success: #00c9a7;
+      --danger: #ff6b6b;
+      --warning: #ffc048;
+      --bg-dark: #0f0f23;
+      --bg-card: #1a1a35;
+      --bg-card-2: #242447;
+      --text-main: #e8e8f0;
+      --text-muted: #8888aa;
+      --text-bright: #ffffff;
+      --border-subtle: rgba(255,255,255,0.08);
+      --glass: rgba(255,255,255,0.05);
+      --glass-border: rgba(255,255,255,0.1);
+      --vodafone-red: #e60000;
+      --shadow-glow: 0 4px 30px rgba(102, 126, 234, 0.15);
+    }
+
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      direction: rtl;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 20% 50%, rgba(102,126,234,0.08) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 20%, rgba(118,75,162,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 40% 80%, rgba(0,210,255,0.04) 0%, transparent 50%);
+      z-index: 0;
+      animation: bgFloat 20s ease-in-out infinite;
+    }
+
+    @keyframes bgFloat {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(20px, -20px) rotate(1deg); }
+      66% { transform: translate(-15px, 15px) rotate(-1deg); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(102,126,234,0.3); }
+      50% { box-shadow: 0 0 40px rgba(102,126,234,0.5); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes countUp {
+      from { opacity: 0; transform: scale(0.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes ring-progress {
+      from { stroke-dasharray: 0 251; }
+    }
+
+    .fade-up { animation: fadeUp 0.5s ease forwards; }
+    .slide-in { animation: slideIn 0.4s ease forwards; }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, rgba(15,15,35,0.95), rgba(26,26,53,0.95));
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 16px 24px;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--grad-1), var(--grad-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 900;
+      color: white;
+      box-shadow: 0 4px 20px rgba(102,126,234,0.4);
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+
+    .logo-text h1 {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--text-bright), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 16px;
+    }
+
+    .btn-icon:hover {
+      background: var(--grad-1);
+      color: white;
+      border-color: var(--grad-1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+    }
+
+    /* ===== LAYOUT ===== */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== VODAFONE CASH BANNER ===== */
+    .vf-banner {
+      background: linear-gradient(135deg, #e60000, #cc0000, #990000);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.5s ease;
+    }
+
+    .vf-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+      animation: bgFloat 15s ease-in-out infinite;
+    }
+
+    .vf-banner-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .vf-logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      color: #e60000;
+      flex-shrink: 0;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .vf-info {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .vf-info h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 4px;
+    }
+
+    .vf-info p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.6;
+    }
+
+    .vf-number-box {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      padding: 12px 24px;
+      text-align: center;
+    }
+
+    .vf-number-box .label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .vf-number {
+      font-size: 28px;
+      font-weight: 900;
+      color: white;
+      letter-spacing: 3px;
+      direction: ltr;
+    }
+
+    .vf-copy-btn {
+      margin-top: 6px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 4px 16px;
+      border-radius: 8px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: 'Cairo';
+      transition: background 0.3s;
+    }
+
+    .vf-copy-btn:hover { background: rgba(255,255,255,0.3); }
+
+    /* ===== MONTH SELECTOR ===== */
+    .month-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 12px 20px;
+      margin-bottom: 20px;
+      animation: fadeUp 0.5s ease 0.1s backwards;
+    }
+
+    .month-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .month-btn:hover {
+      background: var(--grad-1);
+      color: white;
+      border-color: var(--grad-1);
+    }
+
+    .month-select {
+      flex: 1;
+      text-align: center;
+      background: transparent;
+      border: none;
+      color: var(--text-bright);
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Cairo';
+      cursor: pointer;
+      outline: none;
+    }
+
+    .month-select option {
+      background: var(--bg-card);
+      color: var(--text-main);
+    }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: fadeUp 0.5s ease backwards;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.15s; }
+    .stat-card:nth-child(3) { animation-delay: 0.2s; }
+    .stat-card:nth-child(4) { animation-delay: 0.25s; }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      border-radius: 18px 18px 0 0;
+    }
+
+    .stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--grad-1), var(--grad-2)); }
+    .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent), #00f5d4); }
+    .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--success), #00e5ff); }
+    .stat-card:nth-child(4)::before { background: linear-gradient(90deg, var(--warning), #ff9a00); }
+
+    .stat-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--grad-1);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .stat-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 2px;
+      animation: countUp 0.6s ease;
+    }
+
+    .stat-card:nth-child(1) .stat-value { color: var(--grad-1); }
+    .stat-card:nth-child(2) .stat-value { color: var(--accent); }
+    .stat-card:nth-child(3) .stat-value { color: var(--success); }
+    .stat-card:nth-child(4) .stat-value { color: var(--warning); }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* ===== CIRCULAR PROGRESS ===== */
+    .progress-section {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      animation: fadeUp 0.5s ease 0.3s backwards;
+    }
+
+    .ring-container {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0;
+    }
+
+    .ring-container svg {
+      transform: rotate(-90deg);
+      width: 100px;
+      height: 100px;
+    }
+
+    .ring-bg {
+      fill: none;
+      stroke: var(--bg-card-2);
+      stroke-width: 8;
+    }
+
+    .ring-fill {
+      fill: none;
+      stroke: url(#ringGrad);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dasharray 1s ease;
+    }
+
+    .ring-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring-percent {
+      font-size: 22px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--grad-1), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .ring-label { font-size: 9px; color: var(--text-muted); }
+
+    .progress-details { flex: 1; }
+    .progress-details h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+
+    .progress-bar-track {
+      height: 10px;
+      background: var(--bg-card-2);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--grad-1), var(--grad-2), var(--accent));
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+      transition: width 0.8s ease;
+    }
+
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-card);
+      border-radius: 14px;
+      padding: 5px;
+      margin-bottom: 20px;
+      border: 1px solid var(--glass-border);
+      animation: fadeUp 0.5s ease 0.35s backwards;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Cairo';
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .tab-btn:hover { color: var(--text-main); background: var(--glass); }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--grad-1), var(--grad-2));
+      color: white;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+    }
+
+    /* ===== MEMBERS TABLE ===== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .btn-add {
+      background: linear-gradient(135deg, var(--grad-1), var(--grad-2));
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Cairo';
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+
+    .btn-add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(102,126,234,0.5);
+    }
+
+    .members-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .member-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.3s;
+      animation: slideIn 0.4s ease backwards;
+    }
+
+    .member-card:hover {
+      border-color: var(--grad-1);
+      box-shadow: var(--shadow-glow);
+      transform: translateX(-4px);
+    }
+
+    .member-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 900;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .member-info { flex: 1; min-width: 0; }
+
+    .member-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 2px;
+    }
+
+    .member-amount {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .member-status {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 100px;
+    }
+
+    .badge {
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-paid {
+      background: rgba(0,201,167,0.15);
+      color: var(--success);
+      border: 1px solid rgba(0,201,167,0.3);
+    }
+
+    .badge-unpaid {
+      background: rgba(255,107,107,0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255,107,107,0.3);
+    }
+
+    .badge-pending {
+      background: rgba(255,192,72,0.15);
+      color: var(--warning);
+      border: 1px solid rgba(255,192,72,0.3);
+    }
+
+    .pay-date {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .member-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-action {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .btn-action:hover {
+      transform: scale(1.1);
+    }
+
+    .btn-action.pay:hover { background: var(--success); color: white; border-color: var(--success); }
+    .btn-action.edit:hover { background: var(--grad-1); color: white; border-color: var(--grad-1); }
+    .btn-action.delete:hover { background: var(--danger); color: white; border-color: var(--danger); }
+    .btn-action.undo:hover { background: var(--warning); color: white; border-color: var(--warning); }
+    .btn-action.approve:hover { background: var(--success); color: white; border-color: var(--success); }
+    .btn-action.reject:hover { background: var(--danger); color: white; border-color: var(--danger); }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state .icon { font-size: 50px; margin-bottom: 12px; opacity: 0.5; }
+    .empty-state p { font-size: 14px; }
+
+    /* ===== PENDING PAYMENTS (VF CASH NOTIFICATIONS) ===== */
+    .pending-section {
+      background: linear-gradient(135deg, rgba(255,192,72,0.08), rgba(255,107,107,0.05));
+      border: 1px solid rgba(255,192,72,0.2);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .pending-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--warning);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pending-count {
+      background: var(--warning);
+      color: var(--bg-dark);
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    /* ===== CHART ===== */
+    .chart-container {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .chart-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bars-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      height: 180px;
+      padding-top: 10px;
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-value {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .bar {
+      width: 100%;
+      max-width: 50px;
+      border-radius: 10px 10px 4px 4px;
+      transition: height 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      min-height: 6px;
+    }
+
+    .bar.current {
+      background: linear-gradient(180deg, var(--grad-1), var(--grad-2));
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+
+    .bar.other {
+      background: linear-gradient(180deg, var(--bg-card-2), rgba(102,126,234,0.2));
+    }
+
+    .bar-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* ===== DONUT CHART ===== */
+    .donut-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 180px;
+    }
+
+    .donut-svg { width: 130px; height: 130px; }
+
+    .donut-center {
+      font-size: 28px;
+      font-weight: 900;
+      fill: var(--text-bright);
+    }
+
+    .donut-sub {
+      font-size: 10px;
+      fill: var(--text-muted);
+    }
+
+    .donut-legend {
+      display: flex;
+      gap: 20px;
+      margin-top: 12px;
+      font-size: 12px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: 6px;
+    }
+
+    /* ===== HISTORY ===== */
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.2s;
+    }
+
+    .history-item:hover { background: var(--glass); }
+    .history-item:last-child { border-bottom: none; }
+
+    .history-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .history-icon.payment { background: rgba(0,201,167,0.12); }
+    .history-icon.cancel { background: rgba(255,192,72,0.12); }
+    .history-icon.add { background: rgba(102,126,234,0.12); }
+    .history-icon.remove { background: rgba(255,107,107,0.12); }
+    .history-icon.vf-confirm { background: rgba(230,0,0,0.12); }
+
+    .history-info { flex: 1; }
+    .history-action { font-size: 13px; font-weight: 600; }
+    .history-meta { font-size: 11px; color: var(--text-muted); }
+    .history-date { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+    /* ===== SETTINGS ===== */
+    .settings-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 24px;
+    }
+
+    .form-group { margin-bottom: 18px; }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: block;
+      color: var(--text-main);
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      background: var(--bg-card-2);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 14px;
+      color: var(--text-main);
+      font-family: 'Cairo';
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-input:focus, .form-select:focus {
+      border-color: var(--grad-1);
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+
+    .form-select option { background: var(--bg-card); }
+
+    .btn-save {
+      background: linear-gradient(135deg, var(--grad-1), var(--grad-2));
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Cairo';
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+
+    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(102,126,234,0.5); }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger), #cc0000);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Cairo';
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(255,107,107,0.4); }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px;
+      width: 100%;
+      max-width: 420px;
+      animation: fadeUp 0.3s ease;
+      position: relative;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--text-bright), var(--grad-1));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .modal-btns button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Cairo';
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+    }
+
+    .modal-btns .confirm {
+      background: linear-gradient(135deg, var(--grad-1), var(--grad-2));
+      color: white;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+
+    .modal-btns .cancel {
+      background: var(--bg-card-2);
+      color: var(--text-muted);
+      border: 1px solid var(--glass-border);
+    }
+
+    .modal-btns .confirm:hover { transform: translateY(-2px); }
+    .modal-btns .cancel:hover { color: var(--text-main); }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 300;
+      padding: 12px 28px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      animation: fadeUp 0.3s ease;
+      display: none;
+    }
+
+    .toast.success { background: linear-gradient(135deg, var(--success), #00e5a0); color: white; }
+    .toast.error { background: linear-gradient(135deg, var(--danger), #cc0000); color: white; }
+    .toast.info { background: linear-gradient(135deg, var(--grad-1), var(--grad-2)); color: white; }
+
+    /* ===== ALL-TIME TABLE ===== */
+    .alltime-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .alltime-item {
+      background: var(--bg-card-2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .alltime-item .month { color: var(--text-muted); }
+    .alltime-item .amount { font-weight: 800; color: var(--accent); }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .charts-row { grid-template-columns: 1fr; }
+      .vf-banner-content { flex-direction: column; text-align: center; }
+      .progress-section { flex-direction: column; text-align: center; }
+      .member-card { flex-wrap: wrap; }
+    }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; color: black; }
+      body::before { display: none; }
+      .stat-card, .member-card, .chart-container, .progress-section {
+        background: white; border: 1px solid #ddd; color: black;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SVG Gradient Defs -->
+  <svg width="0" height="0">
+    <defs>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#667eea"/>
+        <stop offset="50%" stop-color="#764ba2"/>
+        <stop offset="100%" stop-color="#00d2ff"/>
+      </linearGradient>
+      <linearGradient id="donutPaid" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#00c9a7"/>
+        <stop offset="100%" stop-color="#00e5ff"/>
+      </linearGradient>
+      <linearGradient id="donutUnpaid" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ff6b6b"/>
+        <stop offset="100%" stop-color="#ff8e8e"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header no-print">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">ص</div>
+        <div class="logo-text">
+          <h1 id="headerTitle">صندوق العيلة</h1>
+          <p id="headerDate"></p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" onclick="exportData()" title="تصدير">📤</button>
+        <button class="btn-icon" onclick="document.getElementById('importFile').click()" title="استيراد">📥</button>
+        <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)" style="display:none">
+        <button class="btn-icon" onclick="window.print()" title="طباعة">🖨️</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- ===== VODAFONE CASH BANNER ===== -->
+    <div class="vf-banner no-print" id="vfBanner" style="display:none;">
+      <div class="vf-banner-content">
+        <div class="vf-logo">Vodafone<br>Cash</div>
+        <div class="vf-info">
+          <h3>💳 ادفع عن طريق فودافون كاش</h3>
+          <p>حوّل المبلغ الشهري على الرقم أدناه، ثم اضغط "أرسلت الفلوس" بجوار اسمك، وهيتسجل تلقائي بعد موافقة المسؤول</p>
+        </div>
+        <div class="vf-number-box">
+          <div class="label">رقم فودافون كاش</div>
+          <div class="vf-number" id="vfNumber">—</div>
+          <button class="vf-copy-btn" onclick="copyVfNumber()">📋 نسخ الرقم</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MONTH NAV ===== -->
+    <div class="month-nav no-print">
+      <button class="month-btn" onclick="changeMonth(-1)">→</button>
+      <select class="month-select" id="monthSelect" onchange="loadMonth()"></select>
+      <button class="month-btn" onclick="changeMonth(1)">←</button>
+    </div>
+
+    <!-- ===== STATS ===== -->
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <!-- ===== PROGRESS ===== -->
+    <div class="progress-section" id="progressSection"></div>
+
+    <!-- ===== TABS ===== -->
+    <div class="tabs no-print">
+      <button class="tab-btn active" id="tab-members" onclick="switchTab('members')">👥 الأعضاء</button>
+      <button class="tab-btn" id="tab-chart" onclick="switchTab('chart')">📊 إحصائيات</button>
+      <button class="tab-btn" id="tab-history" onclick="switchTab('history')">📋 السجل</button>
+      <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">⚙️ إعدادات</button>
+    </div>
+
+    <!-- ===== MEMBERS CONTENT ===== -->
+    <div id="content-members"></div>
+
+    <!-- ===== CHART CONTENT ===== -->
+    <div id="content-chart" style="display:none"></div>
+
+    <!-- ===== HISTORY CONTENT ===== -->
+    <div id="content-history" style="display:none"></div>
+
+    <!-- ===== SETTINGS CONTENT ===== -->
+    <div id="content-settings" style="display:none"></div>
+  </div>
+
+  <!-- ===== MODALS ===== -->
+  <div id="modalContainer"></div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast"></div>
+
+<script>
+// ===================== DATA =====================
+const STORAGE = 'family_fund_v2';
+const AR_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const AVATARS = ['🧔','👩','👨','👵','👴','🧑','👦','👧','🧓','👱','👸','🤴','👳','🧕','💁','🙋'];
+const COLORS = ['#667eea','#00c9a7','#ff6b6b','#ffc048','#00d2ff','#764ba2','#f093fb','#ff9a00','#00e5a0','#36d1dc','#5b86e5','#fc5c7d'];
+
+function defaults() {
+  return {
+    settings: { fundName:'صندوق العيلة', defaultAmount:100, currency:'ج.م', vfNumber:'' },
+    members: [],
+    payments: {},
+    pendingPayments: [],
+    history: []
+  };
+}
+
+let D = (() => { try { const r = localStorage.getItem(STORAGE); return r ? JSON.parse(r) : defaults(); } catch(e) { return defaults(); } })();
+if (!D.pendingPayments) D.pendingPayments = [];
+
+function save() { localStorage.setItem(STORAGE, JSON.stringify(D)); }
+
+let curMonth = monthKey(new Date());
+function monthKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function monthLabel(k) { const [y,m]=k.split('-'); return `${AR_MONTHS[+m-1]} ${y}`; }
+function memberColor(i) { return COLORS[i % COLORS.length]; }
+function memberAvatar(i) { return AVATARS[i % AVATARS.length]; }
+
+// ===================== MONTH NAV =====================
+function initMonths() {
+  const s = document.getElementById('monthSelect');
+  s.innerHTML = '';
+  const now = new Date();
+  for (let i = -12; i <= 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth()+i, 1);
+    const k = monthKey(d);
+    const o = document.createElement('option');
+    o.value = k; o.textContent = monthLabel(k);
+    if (k === curMonth) o.selected = true;
+    s.appendChild(o);
+  }
+}
+
+function changeMonth(dir) {
+  const s = document.getElementById('monthSelect');
+  const idx = s.selectedIndex + dir;
+  if (idx >= 0 && idx < s.options.length) { s.selectedIndex = idx; loadMonth(); }
+}
+
+function loadMonth() { curMonth = document.getElementById('monthSelect').value; renderAll(); }
+
+// ===================== RENDER =====================
+function renderAll() {
+  document.getElementById('headerDate').textContent = monthLabel(curMonth);
+  renderVfBanner();
+  renderStats();
+  renderProgress();
+  renderMembers();
+  renderChart();
+  renderHistory();
+  renderSettings();
+}
+
+function renderVfBanner() {
+  const vf = D.settings.vfNumber;
+  const b = document.getElementById('vfBanner');
+  if (vf) {
+    b.style.display = '';
+    document.getElementById('vfNumber').textContent = vf;
+  } else {
+    b.style.display = 'none';
+  }
+}
+
+function renderStats() {
+  const mp = D.payments[curMonth] || {};
+  const totalExp = D.members.reduce((s,m) => s + m.amount, 0);
+  const paid = D.members.filter(m => mp[m.id]?.paid);
+  const totalCol = paid.reduce((s,m) => (mp[m.id]?.amount||0) + s, 0);
+  let allTime = 0;
+  Object.values(D.payments).forEach(p => Object.values(p).forEach(v => { if(v.paid) allTime += (v.amount||0); }));
+  const cur = D.settings.currency;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card">
+      <span class="stat-icon">💰</span>
+      <div class="stat-value">${totalCol.toLocaleString('ar-EG')} ${cur}</div>
+      <div class="stat-label">المُحصّل هذا الشهر</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">🎯</span>
+      <div class="stat-value">${totalExp.toLocaleString('ar-EG')} ${cur}</div>
+      <div class="stat-label">المطلوب تحصيله</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">✅</span>
+      <div class="stat-value">${paid.length} / ${D.members.length}</div>
+      <div class="stat-label">قاموا بالسداد</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">🏦</span>
+      <div class="stat-value">${allTime.toLocaleString('ar-EG')} ${cur}</div>
+      <div class="stat-label">إجمالي كل الأشهر</div>
+    </div>
+  `;
+}
+
+function renderProgress() {
+  const mp = D.payments[curMonth] || {};
+  const totalExp = D.members.reduce((s,m) => s + m.amount, 0);
+  const paid = D.members.filter(m => mp[m.id]?.paid);
+  const totalCol = paid.reduce((s,m) => (mp[m.id]?.amount||0) + s, 0);
+  const pct = totalExp > 0 ? Math.round((totalCol/totalExp)*100) : 0;
+  const circumference = 2 * Math.PI * 40;
+  const dashArray = (pct / 100) * circumference;
+
+  document.getElementById('progressSection').innerHTML = `
+    <div class="ring-container">
+      <svg viewBox="0 0 100 100">
+        <circle class="ring-bg" cx="50" cy="50" r="40"/>
+        <circle class="ring-fill" cx="50" cy="50" r="40"
+                stroke-dasharray="${dashArray} ${circumference}"
+                style="animation: ring-progress 1.5s ease forwards;"/>
+      </svg>
+      <div class="ring-text">
+        <span class="ring-percent">${pct}%</span>
+        <span class="ring-label">تحصيل</span>
+      </div>
+    </div>
+    <div class="progress-details">
+      <h3>نسبة التحصيل لشهر ${monthLabel(curMonth)}</h3>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-stats">
+        <span>تم تحصيل ${totalCol.toLocaleString('ar-EG')} ${D.settings.currency}</span>
+        <span>متبقي ${(totalExp - totalCol).toLocaleString('ar-EG')} ${D.settings.currency}</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderMembers() {
+  const mp = D.payments[curMonth] || {};
+  const pending = D.pendingPayments.filter(p => p.month === curMonth);
+  let html = '';
+
+  // Pending payments section
+  if (pending.length > 0) {
+    html += `
+      <div class="pending-section fade-up">
+        <div class="pending-title">
+          🔔 طلبات سداد في انتظار الموافقة
+          <span class="pending-count">${pending.length}</span>
+        </div>
+        <div class="members-grid">
+          ${pending.map((p, i) => {
+            const m = D.members.find(x => x.id === p.memberId);
+            if (!m) return '';
+            const mi = D.members.indexOf(m);
+            return `
+              <div class="member-card slide-in" style="animation-delay:${i*0.05}s; border-color: rgba(255,192,72,0.3);">
+                <div class="member-avatar" style="background: linear-gradient(135deg, ${memberColor(mi)}, ${memberColor(mi+3)})">
+                  ${memberAvatar(mi)}
+                </div>
+                <div class="member-info">
+                  <div class="member-name">${m.name}</div>
+                  <div class="member-amount">يطلب تأكيد سداد ${p.amount.toLocaleString('ar-EG')} ${D.settings.currency}</div>
+                </div>
+                <div class="member-actions">
+                  <button class="btn-action approve" onclick="approvePending(${i})" title="قبول">✅</button>
+                  <button class="btn-action reject" onclick="rejectPending(${i})" title="رفض">❌</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // Section header
+  html += `
+    <div class="section-header">
+      <h2 class="section-title">👥 أعضاء الصندوق</h2>
+      <button class="btn-add no-print" onclick="showModal('add')">➕ إضافة عضو</button>
+    </div>
+  `;
+
+  if (D.members.length === 0) {
+    html += `<div class="empty-state fade-up"><div class="icon">👨‍👩‍👧‍👦</div><p>لا يوجد أعضاء بعد — أضف أعضاء العائلة للبدء!</p></div>`;
+  } else {
+    html += '<div class="members-grid">';
+    D.members.forEach((m, i) => {
+      const pay = mp[m.id];
+      const isPaid = pay?.paid;
+      const hasPending = D.pendingPayments.some(p => p.memberId === m.id && p.month === curMonth);
+      const payDate = isPaid ? new Date(pay.date).toLocaleDateString('ar-EG', { day:'numeric', month:'short' }) : '';
+
+      html += `
+        <div class="member-card slide-in" style="animation-delay:${i*0.06}s">
+          <div class="member-avatar" style="background: linear-gradient(135deg, ${memberColor(i)}, ${memberColor(i+3)})">
+            ${memberAvatar(i)}
+          </div>
+          <div class="member-info">
+            <div class="member-name">${m.name}</div>
+            <div class="member-amount">${m.amount.toLocaleString('ar-EG')} ${D.settings.currency} / شهرياً</div>
+          </div>
+          <div class="member-status">
+            <span class="badge ${isPaid ? 'badge-paid' : hasPending ? 'badge-pending' : 'badge-unpaid'}">
+              ${isPaid ? '✅ تم السداد' : hasPending ? '⏳ في الانتظار' : '⏳ لم يسدد'}
+            </span>
+            ${payDate ? `<span class="pay-date">${payDate}</span>` : ''}
+          </div>
+          <div class="member-actions no-print">
+            ${isPaid
+              ? `<button class="btn-action undo" onclick="cancelPayment('${m.id}')" title="إلغاء السداد">↩️</button>`
+              : hasPending
+                ? ''
+                : `<button class="btn-action pay" onclick="showModal('pay','${m.id}')" title="تسجيل سداد">💵</button>
+                   <button class="btn-action" style="font-size:12px;" onclick="sendPendingPayment('${m.id}')" title="أرسلت فودافون كاش">📱</button>`
+            }
+            <button class="btn-action edit" onclick="showModal('edit','${m.id}')" title="تعديل">✏️</button>
+            <button class="btn-action delete" onclick="removeMember('${m.id}')" title="حذف">🗑️</button>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+  }
+
+  document.getElementById('content-members').innerHTML = html;
+}
+
+function renderChart() {
+  const cur = D.settings.currency;
+  const now = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const k = monthKey(d);
+    let t = 0;
+    if (D.payments[k]) Object.values(D.payments[k]).forEach(p => { if(p.paid) t += (p.amount||0); });
+    months.push({ key:k, label:AR_MONTHS[d.getMonth()], total:t });
+  }
+  const maxV = Math.max(...months.map(m=>m.total), 1);
+
+  // Donut
+  const mp = D.payments[curMonth] || {};
+  const paidC = D.members.filter(m => mp[m.id]?.paid).length;
+  const totalC = D.members.length;
+  const pPct = totalC > 0 ? Math.round((paidC/totalC)*100) : 0;
+  const uPct = 100 - pPct;
+  const r = 50, circ = 2*Math.PI*r;
+
+  // All-time
+  let allTime = 0;
+  const mTotals = {};
+  Object.entries(D.payments).forEach(([mk, mp2]) => {
+    let mT = 0;
+    Object.values(mp2).forEach(p => { if(p.paid) { allTime += (p.amount||0); mT += (p.amount||0); } });
+    if (mT > 0) mTotals[mk] = mT;
+  });
+
+  document.getElementById('content-chart').innerHTML = `
+    <div class="charts-row">
+      <div class="chart-container fade-up">
+        <div class="chart-title">📊 التحصيل الشهري (آخر ٦ أشهر)</div>
+        <div class="bars-container">
+          ${months.map(m => {
+            const h = Math.max((m.total/maxV)*100, 4);
+            return `<div class="bar-col">
+              <span class="bar-value">${m.total > 0 ? m.total.toLocaleString('ar-EG') : '٠'}</span>
+              <div class="bar ${m.key===curMonth?'current':'other'}" style="height:${h}%"></div>
+              <span class="bar-label">${m.label}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="chart-container fade-up">
+        <div class="chart-title">🍩 ملخص الشهر الحالي</div>
+        <div class="donut-wrap">
+          <svg class="donut-svg" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--bg-card-2)" stroke-width="14" />
+            <circle cx="60" cy="60" r="${r}" fill="none" stroke="url(#donutPaid)" stroke-width="14"
+                    stroke-dasharray="${(pPct/100)*circ} ${circ}"
+                    stroke-linecap="round" transform="rotate(-90 60 60)"
+                    style="transition: stroke-dasharray 1s ease;"/>
+            <text class="donut-center" x="60" y="58" text-anchor="middle" dominant-baseline="middle">${pPct}%</text>
+            <text class="donut-sub" x="60" y="74" text-anchor="middle">تحصيل</text>
+          </svg>
+          <div class="donut-legend">
+            <span><span class="legend-dot" style="background: var(--success)"></span> سددوا: ${paidC}</span>
+            <span><span class="legend-dot" style="background: var(--danger)"></span> لم يسددوا: ${totalC - paidC}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-container fade-up" style="margin-top:16px">
+      <div class="chart-title">🏦 إجمالي المحاصيل لكل الأشهر</div>
+      <div style="text-align:center; margin-bottom:16px;">
+        <div style="font-size:36px; font-weight:900; background: linear-gradient(135deg, var(--grad-1), var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">
+          ${allTime.toLocaleString('ar-EG')} ${cur}
+        </div>
+        <div style="font-size:13px; color:var(--text-muted);">إجمالي ما تم تحصيله منذ البداية</div>
+      </div>
+      ${Object.keys(mTotals).length > 0 ? `
+        <div class="alltime-grid">
+          ${Object.entries(mTotals).sort((a,b)=>a[0].localeCompare(b[0])).map(([mk,mt]) => `
+            <div class="alltime-item">
+              <span class="month">${monthLabel(mk)}</span>
+              <span class="amount">${mt.toLocaleString('ar-EG')} ${cur}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<div style="text-align:center; color:var(--text-muted); font-size:13px;">لا توجد بيانات بعد</div>'}
+    </div>
+  `;
+}
+
+function renderHistory() {
+  const icons = { payment:'payment', cancel_payment:'cancel', add_member:'add', remove_member:'remove', vf_pending:'vf-confirm', vf_approved:'vf-confirm', vf_rejected:'cancel' };
+  const labels = { payment:'💵 سداد', cancel_payment:'↩️ إلغاء سداد', add_member:'➕ إضافة عضو', remove_member:'🗑️ حذف عضو', vf_pending:'📱 طلب سداد', vf_approved:'✅ موافقة على سداد', vf_rejected:'❌ رفض طلب سداد' };
+  const cur = D.settings.currency;
+
+  if (D.history.length === 0) {
+    document.getElementById('content-history').innerHTML = `
+      <div class="chart-container"><div class="empty-state"><div class="icon">📋</div><p>لا توجد عمليات مسجلة بعد</p></div></div>
+    `;
+    return;
+  }
+
+  document.getElementById('content-history').innerHTML = `
+    <div class="chart-container" style="padding:0; overflow:hidden;">
+      ${D.history.slice(0,50).map(h => {
+        const d = new Date(h.date);
+        const ds = d.toLocaleDateString('ar-EG', { day:'numeric', month:'short', year:'numeric' });
+        const ts = d.toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' });
+        return `
+          <div class="history-item">
+            <div class="history-icon ${icons[h.action]||'payment'}">
+              ${(labels[h.action]||h.action).split(' ')[0]}
+            </div>
+            <div class="history-info">
+              <div class="history-action">${labels[h.action]||h.action} — ${h.member||''}</div>
+              <div class="history-meta">
+                ${h.amount ? `${h.amount.toLocaleString('ar-EG')} ${cur}` : ''}
+                ${h.note ? ` • ${h.note}` : ''}
+                • ${monthLabel(h.month)}
+              </div>
+            </div>
+            <div class="history-date">${ds}<br>${ts}</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderSettings() {
+  document.getElementById('content-settings').innerHTML = `
+    <div class="settings-card fade-up">
+      <div class="form-group">
+        <label class="form-label">اسم الصندوق</label>
+        <input class="form-input" id="setName" value="${D.settings.fundName}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">المبلغ الشهري الافتراضي</label>
+        <input class="form-input" type="number" id="setAmount" value="${D.settings.defaultAmount}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">العملة</label>
+        <select class="form-select" id="setCurrency">
+          ${['ج.م|جنيه مصري','ر.س|ريال سعودي','د.إ|درهم إماراتي','د.ك|دينار كويتي','د.أ|دينار أردني','$|دولار أمريكي']
+            .map(x => { const [v,l]=x.split('|'); return `<option value="${v}" ${v===D.settings.currency?'selected':''}>${l} (${v})</option>`; }).join('')}
+        </select>
+      </div>
+      <div class="form-group" style="padding-top:16px; border-top:1px solid var(--glass-border);">
+        <label class="form-label" style="color:var(--vodafone-red);">📱 رقم فودافون كاش</label>
+        <input class="form-input" id="setVfNumber" placeholder="مثال: 01012345678" value="${D.settings.vfNumber||''}" style="direction:ltr; text-align:center; font-size:18px; letter-spacing:2px;">
+        <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">أدخل رقم فودافون كاش لاستقبال المدفوعات. سيظهر في بانر أعلى الصفحة.</p>
+      </div>
+      <div style="display:flex; gap:12px; margin-top:20px; flex-wrap:wrap;">
+        <button class="btn-save" onclick="saveSettings()">💾 حفظ الإعدادات</button>
+        <button class="btn-danger" onclick="confirmReset()">🗑️ مسح جميع البيانات</button>
+      </div>
+    </div>
+  `;
+}
+
+// ===================== ACTIONS =====================
+function showModal(type, memberId) {
+  let html = '';
+  if (type === 'add') {
+    html = `
+      <div class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+          <div class="modal-title">➕ إضافة عضو جديد</div>
+          <div class="form-group">
+            <label class="form-label">اسم العضو</label>
+            <input class="form-input" id="mName" placeholder="مثال: أحمد محمد">
+          </div>
+          <div class="form-group">
+            <label class="form-label">المبلغ الشهري (${D.settings.currency})</label>
+            <input class="form-input" type="number" id="mAmount" value="${D.settings.defaultAmount}">
+          </div>
+          <div class="modal-btns">
+            <button class="confirm" onclick="addMember()">إضافة ✅</button>
+            <button class="cancel" onclick="closeModal()">إلغاء</button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (type === 'pay') {
+    const m = D.members.find(x => x.id === memberId);
+    html = `
+      <div class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+          <div class="modal-title">💵 تسجيل سداد</div>
+          <input type="hidden" id="payId" value="${memberId}">
+          <div style="text-align:center; margin-bottom:16px;">
+            <div style="font-size:36px;">${memberAvatar(D.members.indexOf(m))}</div>
+            <div style="font-size:18px; font-weight:800; color:var(--grad-1); margin-top:4px;">${m.name}</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">المبلغ المدفوع (${D.settings.currency})</label>
+            <input class="form-input" type="number" id="payAmount" value="${m.amount}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ملاحظات (اختياري)</label>
+            <input class="form-input" id="payNote" placeholder="مثال: نقداً / تحويل بنكي">
+          </div>
+          <div class="modal-btns">
+            <button class="confirm" onclick="recordPayment()">تأكيد السداد ✅</button>
+            <button class="cancel" onclick="closeModal()">إلغاء</button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (type === 'edit') {
+    const m = D.members.find(x => x.id === memberId);
+    html = `
+      <div class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+          <div class="modal-title">✏️ تعديل بيانات العضو</div>
+          <input type="hidden" id="editId" value="${memberId}">
+          <div class="form-group">
+            <label class="form-label">اسم العضو</label>
+            <input class="form-input" id="editName" value="${m.name}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">المبلغ الشهري (${D.settings.currency})</label>
+            <input class="form-input" type="number" id="editAmount" value="${m.amount}">
+          </div>
+          <div class="modal-btns">
+            <button class="confirm" onclick="saveEdit()">حفظ ✅</button>
+            <button class="cancel" onclick="closeModal()">إلغاء</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById('modalContainer').innerHTML = html;
+  setTimeout(() => { const inp = document.querySelector('.modal-box input:not([type=hidden])'); if(inp) inp.focus(); }, 100);
+}
+
+function closeModal(e) {
+  if (e && e.target && !e.target.classList.contains('modal-overlay')) return;
+  document.getElementById('modalContainer').innerHTML = '';
+}
+
+function addMember() {
+  const name = document.getElementById('mName').value.trim();
+  const amount = parseFloat(document.getElementById('mAmount').value) || D.settings.defaultAmount;
+  if (!name) { toast('⚠️ أدخل اسم العضو', 'error'); return; }
+  D.members.push({ id:'m'+Date.now(), name, amount });
+  D.history.unshift({ date:new Date().toISOString(), action:'add_member', member:name, amount, month:curMonth });
+  save(); closeModal(); renderAll();
+  toast(`✅ تمت إضافة ${name}`, 'success');
+}
+
+function recordPayment() {
+  const id = document.getElementById('payId').value;
+  const amount = parseFloat(document.getElementById('payAmount').value) || 0;
+  const note = document.getElementById('payNote').value.trim();
+  const m = D.members.find(x => x.id === id);
+  if (!m || amount <= 0) { toast('⚠️ أدخل مبلغاً صحيحاً', 'error'); return; }
+  if (!D.payments[curMonth]) D.payments[curMonth] = {};
+  D.payments[curMonth][id] = { paid:true, amount, date:new Date().toISOString(), note };
+  D.history.unshift({ date:new Date().toISOString(), action:'payment', member:m.name, amount, month:curMonth, note });
+  save(); closeModal(); renderAll();
+  toast(`✅ تم تسجيل سداد ${m.name}`, 'success');
+}
+
+function cancelPayment(id) {
+  const m = D.members.find(x => x.id === id);
+  if (!m || !confirm(`إلغاء سداد "${m.name}" لهذا الشهر؟`)) return;
+  if (D.payments[curMonth]) delete D.payments[curMonth][id];
+  D.history.unshift({ date:new Date().toISOString(), action:'cancel_payment', member:m.name, month:curMonth });
+  save(); renderAll();
+  toast(`↩️ تم إلغاء سداد ${m.name}`, 'info');
+}
+
+function saveEdit() {
+  const id = document.getElementById('editId').value;
+  const m = D.members.find(x => x.id === id);
+  if (!m) return;
+  m.name = document.getElementById('editName').value.trim();
+  m.amount = parseFloat(document.getElementById('editAmount').value) || D.settings.defaultAmount;
+  save(); closeModal(); renderAll();
+  toast('✅ تم حفظ التعديلات', 'success');
+}
+
+function removeMember(id) {
+  const m = D.members.find(x => x.id === id);
+  if (!m || !confirm(`حذف "${m.name}" من الصندوق؟`)) return;
+  D.members = D.members.filter(x => x.id !== id);
+  D.history.unshift({ date:new Date().toISOString(), action:'remove_member', member:m.name, month:curMonth });
+  save(); renderAll();
+  toast(`🗑️ تم حذف ${m.name}`, 'error');
+}
+
+// Vodafone Cash - pending payment simulation
+function sendPendingPayment(memberId) {
+  const m = D.members.find(x => x.id === memberId);
+  if (!m) return;
+  if (D.pendingPayments.some(p => p.memberId === memberId && p.month === curMonth)) {
+    toast('⏳ يوجد طلب سداد في الانتظار بالفعل', 'info'); return;
+  }
+  D.pendingPayments.push({ memberId, month:curMonth, amount:m.amount, date:new Date().toISOString() });
+  D.history.unshift({ date:new Date().toISOString(), action:'vf_pending', member:m.name, amount:m.amount, month:curMonth, note:'طلب سداد فودافون كاش' });
+  save(); renderAll();
+  toast(`📱 تم إرسال طلب سداد ${m.name} — في انتظار الموافقة`, 'info');
+}
+
+function approvePending(idx) {
+  const p = D.pendingPayments.filter(x => x.month === curMonth)[idx];
+  if (!p) return;
+  const m = D.members.find(x => x.id === p.memberId);
+  if (!D.payments[curMonth]) D.payments[curMonth] = {};
+  D.payments[curMonth][p.memberId] = { paid:true, amount:p.amount, date:new Date().toISOString(), note:'فودافون كاش ✅' };
+  D.history.unshift({ date:new Date().toISOString(), action:'vf_approved', member:m?.name, amount:p.amount, month:curMonth, note:'تمت الموافقة على سداد فودافون كاش' });
+  D.pendingPayments = D.pendingPayments.filter(x => !(x.memberId === p.memberId && x.month === curMonth));
+  save(); renderAll();
+  toast(`✅ تمت الموافقة على سداد ${m?.name}`, 'success');
+}
+
+function rejectPending(idx) {
+  const p = D.pendingPayments.filter(x => x.month === curMonth)[idx];
+  if (!p) return;
+  const m = D.members.find(x => x.id === p.memberId);
+  D.history.unshift({ date:new Date().toISOString(), action:'vf_rejected', member:m?.name, month:curMonth, note:'تم رفض طلب السداد' });
+  D.pendingPayments = D.pendingPayments.filter(x => !(x.memberId === p.memberId && x.month === curMonth));
+  save(); renderAll();
+  toast(`❌ تم رفض طلب سداد ${m?.name}`, 'error');
+}
+
+function saveSettings() {
+  D.settings.fundName = document.getElementById('setName').value.trim() || 'صندوق العيلة';
+  D.settings.defaultAmount = parseFloat(document.getElementById('setAmount').value) || 100;
+  D.settings.currency = document.getElementById('setCurrency').value;
+  D.settings.vfNumber = document.getElementById('setVfNumber').value.trim();
+  save(); renderAll();
+  document.getElementById('headerTitle').textContent = D.settings.fundName;
+  toast('✅ تم حفظ الإعدادات', 'success');
+}
+
+function confirmReset() {
+  if (!confirm('⚠️ مسح جميع البيانات نهائياً؟')) return;
+  localStorage.removeItem(STORAGE);
+  D = defaults(); save(); renderAll();
+  toast('🗑️ تم مسح جميع البيانات', 'error');
+}
+
+function copyVfNumber() {
+  const n = D.settings.vfNumber;
+  if (n) { navigator.clipboard?.writeText(n); toast('📋 تم نسخ الرقم', 'info'); }
+}
+
+// ===================== TABS =====================
+function switchTab(t) {
+  ['members','chart','history','settings'].forEach(x => {
+    document.getElementById('content-'+x).style.display = x===t ? '' : 'none';
+    document.getElementById('tab-'+x).className = 'tab-btn' + (x===t ? ' active' : '');
+  });
+  if (t === 'chart') renderChart();
+}
+
+// ===================== EXPORT / IMPORT =====================
+function exportData() {
+  const b = new Blob([JSON.stringify(D,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = `صندوق_العيلة_${curMonth}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('📤 تم تصدير البيانات', 'success');
+}
+
+function importData(ev) {
+  const f = ev.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const imp = JSON.parse(e.target.result);
+      if (imp.members && imp.payments) {
+        D = imp; if (!D.pendingPayments) D.pendingPayments = [];
+        save(); renderAll();
+        toast('📥 تم استيراد البيانات بنجاح', 'success');
+      } else toast('⚠️ ملف غير صالح', 'error');
+    } catch(e) { toast('⚠️ خطأ في قراءة الملف', 'error'); }
+  };
+  r.readAsText(f);
+  ev.target.value = '';
+}
+
+// ===================== TOAST =====================
+function toast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type}`;
+  t.style.display = 'block';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.style.display = 'none'; }, 2800);
+}
+
+// ===================== INIT =====================
+initMonths();
+renderAll();
+
+// ===================== PWA =====================
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW registration failed:', err));
+  });
+}
+
+// Install Prompt
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  // Don't show if already installed
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  
+  const banner = document.createElement('div');
+  banner.id = 'installBanner';
+  banner.style.cssText = `
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; box-shadow: 0 -4px 30px rgba(0,0,0,0.3); animation: fadeUp 0.5s ease;
+    direction: rtl; font-family: 'Cairo', sans-serif;
+  `;
+  banner.innerHTML = `
+    <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+      <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📱</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:white;">تثبيت صندوق العيلة</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.8);">أضف التطبيق لشاشتك الرئيسية للوصول السريع</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0;">
+      <button onclick="installPWA()" style="background:white;color:#667eea;border:none;padding:8px 20px;border-radius:10px;font-size:13px;font-weight:700;font-family:Cairo;cursor:pointer;">تثبيت ⬇️</button>
+      <button onclick="dismissInstall()" style="background:rgba(255,255,255,0.15);color:white;border:none;padding:8px 14px;border-radius:10px;font-size:13px;font-family:Cairo;cursor:pointer;">لاحقاً</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+}
+
+function installPWA() {
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.remove();
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choice => {
+      if (choice.outcome === 'accepted') {
+        toast('🎉 تم تثبيت التطبيق بنجاح!', 'success');
+      }
+      deferredPrompt = null;
+    });
+  }
+}
+
+function dismissInstall() {
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.remove();
+}
+
+// Detect if running as installed PWA
+window.addEventListener('appinstalled', () => {
+  toast('🎉 تم تثبيت صندوق العيلة!', 'success');
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.remove();
+});
+
+// Offline indicator
+window.addEventListener('online', () => toast('🌐 تم استعادة الاتصال', 'success'));
+window.addEventListener('offline', () => toast('📴 أنت غير متصل - التطبيق يعمل بدون إنترنت', 'info'));
+</script>
+</body>
+</html>

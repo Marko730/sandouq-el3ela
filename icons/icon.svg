@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141432"/>
+      <stop offset="50%" stop-color="#1e1845"/>
+      <stop offset="100%" stop-color="#0d0b24"/>
+    </linearGradient>
+
+    <!-- Chest Body Gradient -->
+    <linearGradient id="chestGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#764ba2"/>
+      <stop offset="40%" stop-color="#55379b"/>
+      <stop offset="100%" stop-color="#341e6b"/>
+    </linearGradient>
+
+    <!-- Chest Lid Gradient -->
+    <linearGradient id="lidGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8f5fe8"/>
+      <stop offset="50%" stop-color="#6c3ecb"/>
+      <stop offset="100%" stop-color="#4e259e"/>
+    </linearGradient>
+
+    <!-- Gold Foil Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff1aa"/>
+      <stop offset="30%" stop-color="#ffd043"/>
+      <stop offset="70%" stop-color="#e59819"/>
+      <stop offset="100%" stop-color="#b86d05"/>
+    </linearGradient>
+
+    <!-- Soft Gold Gradient -->
+    <linearGradient id="goldSoft" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe885"/>
+      <stop offset="100%" stop-color="#e8a317"/>
+    </linearGradient>
+
+    <!-- Accent Cyan Glow -->
+    <radialGradient id="cyanGlow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="rgba(0, 210, 255, 0.4)"/>
+      <stop offset="60%" stop-color="rgba(102, 126, 234, 0.15)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+
+    <!-- Golden Aura -->
+    <radialGradient id="goldAura" cx="50%" cy="30%" r="45%">
+      <stop offset="0%" stop-color="rgba(255, 208, 67, 0.45)"/>
+      <stop offset="50%" stop-color="rgba(255, 160, 20, 0.15)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="shadowBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+
+    <filter id="glowGold" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#ffd043" flood-opacity="0.6"/>
+    </filter>
+
+    <filter id="lidShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#110729" flood-opacity="0.7"/>
+    </filter>
+  </defs>
+
+  <!-- 1. Squircle App Background -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGrad)"/>
+
+  <!-- Subtle Border Ring -->
+  <rect x="3" y="3" width="506" height="506" rx="112" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="3"/>
+
+  <!-- Glows behind the chest & coins -->
+  <circle cx="256" cy="220" r="190" fill="url(#cyanGlow)"/>
+  <circle cx="256" cy="170" r="140" fill="url(#goldAura)"/>
+
+  <!-- Sparkles / Stars -->
+  <!-- Sparkle 1 Top Right -->
+  <path d="M385 110 Q385 130 405 130 Q385 130 385 150 Q385 130 365 130 Q385 130 385 110 Z" fill="#ffd54f" opacity="0.85"/>
+  <!-- Sparkle 2 Top Left -->
+  <path d="M125 140 Q125 155 140 155 Q125 155 125 170 Q125 155 110 155 Q125 155 125 140 Z" fill="#4dd0e1" opacity="0.85"/>
+  <!-- Sparkle 3 Small Right -->
+  <circle cx="420" cy="210" r="3.5" fill="#ffe082" opacity="0.8"/>
+  <circle cx="95" cy="230" r="3" fill="#80deea" opacity="0.7"/>
+
+  <!-- 2. The Chest (صندوق العيلة) Main Body -->
+  <g filter="url(#shadowBlur)">
+    <!-- Base Body -->
+    <rect x="106" y="240" width="300" height="175" rx="26" fill="url(#chestGrad)"/>
+    <!-- Subtle 3D edge highlight -->
+    <rect x="108" y="242" width="296" height="171" rx="24" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+
+    <!-- Left & Right Gold Corner Reinforcements -->
+    <!-- Left Plate -->
+    <path d="M106 262 Q106 242 126 242 L145 242 L145 415 L126 415 Q106 415 106 395 Z" fill="url(#goldGrad)" opacity="0.9"/>
+    <!-- Right Plate -->
+    <path d="M406 262 Q406 242 386 242 L367 242 L367 415 L386 415 Q406 415 406 395 Z" fill="url(#goldGrad)" opacity="0.9"/>
+
+    <!-- Corner Rivets / Studs -->
+    <circle cx="126" cy="262" r="5" fill="#fff3b0"/>
+    <circle cx="126" cy="395" r="5" fill="#fff3b0"/>
+    <circle cx="386" cy="262" r="5" fill="#fff3b0"/>
+    <circle cx="386" cy="395" r="5" fill="#fff3b0"/>
+
+    <!-- Central Gold Vertical Band -->
+    <rect x="232" y="240" width="48" height="175" fill="url(#goldGrad)"/>
+  </g>
+
+  <!-- 3. Chest Lid (Curved & Open/Semi-open slot) -->
+  <g filter="url(#lidShadow)">
+    <!-- Lid shape with arched top -->
+    <path d="M96 230 C96 195 140 180 256 180 C372 180 416 195 416 230 L416 248 C416 254 411 258 405 258 L107 258 C101 258 96 254 96 248 Z" fill="url(#lidGrad)"/>
+    <!-- Lid Rim Highlight -->
+    <path d="M98 232 C108 202 150 183 256 183 C362 183 404 202 414 232" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+
+    <!-- Gold Band on Lid -->
+    <rect x="230" y="180" width="52" height="78" fill="url(#goldGrad)"/>
+    <!-- Lid Left/Right Gold Edges -->
+    <path d="M96 226 C98 206 118 196 142 191 L142 258 L105 258 C100 258 96 254 96 248 Z" fill="url(#goldGrad)" opacity="0.85"/>
+    <path d="M416 226 C414 206 394 196 370 191 L370 258 L407 258 C412 258 416 254 416 248 Z" fill="url(#goldGrad)" opacity="0.85"/>
+
+    <!-- Coin Slot on top of Lid -->
+    <ellipse cx="256" cy="188" rx="42" ry="6" fill="#13082b"/>
+    <ellipse cx="256" cy="189" rx="38" ry="4" fill="#090317"/>
+  </g>
+
+  <!-- 4. Family Empathy Symbol: Golden Lock with Family Silhouette -->
+  <g filter="url(#glowGold)">
+    <!-- Heart / Shield Shaped Lock Base -->
+    <rect x="228" y="278" width="56" height="52" rx="14" fill="url(#goldSoft)"/>
+    <rect x="230" y="280" width="52" height="48" rx="12" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.6"/>
+
+    <!-- Lock Shackle (Loop) -->
+    <path d="M239 278 L239 264 C239 254 273 254 273 264 L273 278" fill="none" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round"/>
+
+    <!-- Keyhole / Family Heart Cutout -->
+    <!-- Stylized Heart representing Family Love & Care -->
+    <path d="M256 312 C256 312 242 302 242 293 C242 288 246 285 250 285 C253 285 255 287 256 289 C257 287 259 285 262 285 C266 285 270 288 270 293 C270 302 256 312 256 312 Z" fill="#2d1354"/>
+  </g>
+
+  <!-- 5. Dynamic Dropping Gold Coin (entering the slot) -->
+  <g filter="url(#glowGold)">
+    <!-- Light Trail below coin -->
+    <polygon points="248,155 264,155 268,188 244,188" fill="url(#goldSoft)" opacity="0.45"/>
+
+    <!-- Main Dynamic Coin (Tilted perspective dropping in) -->
+    <ellipse cx="256" cy="142" rx="46" ry="22" fill="url(#goldGrad)"/>
+    <!-- 3D Coin Edge -->
+    <path d="M210 142 C210 154 231 163 256 163 C281 163 302 154 302 142 L302 150 C302 162 281 171 256 171 C231 171 210 162 210 150 Z" fill="#c47a06"/>
+    <!-- Inner Rim -->
+    <ellipse cx="256" cy="142" rx="38" ry="17" fill="none" stroke="#fff4b8" stroke-width="2"/>
+
+    <!-- Arabic symbol or Family icon on the Coin -->
+    <!-- Stylized Currency/Family Group on Coin: Adult and child hands / growth icon -->
+    <text x="256" y="148" text-anchor="middle" font-size="20" font-weight="900" font-family="'Cairo', Arial, sans-serif" fill="#754302">ج.م</text>
+  </g>
+
+  <!-- 6. Floating Ambient Coins around -->
+  <!-- Coin Left -->
+  <g filter="url(#glowGold)" opacity="0.9">
+    <ellipse cx="160" cy="180" rx="22" ry="24" fill="url(#goldGrad)" transform="rotate(-20 160 180)"/>
+    <ellipse cx="160" cy="180" rx="16" ry="18" fill="none" stroke="#fff9d6" stroke-width="1.5" transform="rotate(-20 160 180)"/>
+    <text x="160" y="186" text-anchor="middle" font-size="14" font-weight="bold" fill="#7d4905" transform="rotate(-20 160 180)">★</text>
+  </g>
+
+  <!-- Coin Right -->
+  <g filter="url(#glowGold)" opacity="0.9">
+    <ellipse cx="350" cy="170" rx="20" ry="23" fill="url(#goldGrad)" transform="rotate(25 350 170)"/>
+    <ellipse cx="350" cy="170" rx="15" ry="17" fill="none" stroke="#fff9d6" stroke-width="1.5" transform="rotate(25 350 170)"/>
+    <text x="350" y="176" text-anchor="middle" font-size="14" font-weight="bold" fill="#7d4905" transform="rotate(25 350 170)">★</text>
+  </g>
+
+  <!-- 7. Light Reflection across top left of App Icon -->
+  <path d="M0 115 C0 51 51 0 115 0 L280 0 L0 280 Z" fill="url(#goldSoft)" opacity="0.04"/>
+</svg>
