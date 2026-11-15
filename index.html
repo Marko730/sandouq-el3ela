@@ -1780,13 +1780,149 @@ function switchTab(t) {
 
 // ===================== EXPORT / IMPORT =====================
 function exportData() {
-  const b = new Blob([JSON.stringify(D,null,2)], {type:'application/json'});
+  const html = `
+    <div class="modal-overlay" onclick="closeModal(event)">
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-title">📤 تصدير بيانات الصندوق</div>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:18px;">اختر الصيغة المناسبة لك:</p>
+        
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Excel CSV -->
+          <button onclick="exportToExcel(); closeModal();" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--bg-card-2); border:1px solid var(--glass-border); border-radius:14px; color:white; cursor:pointer; text-align:right; font-family:Cairo; transition:all 0.2s;">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(0,201,167,0.15);color:var(--success);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📊</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;">ملف إكسيل (Excel / CSV)</div>
+              <div style="font-size:11px;color:var(--text-muted);">جدول منظم ومقروء يفتح في Excel مباشرة بالعربي</div>
+            </div>
+          </button>
+
+          <!-- Text Report -->
+          <button onclick="exportToText(); closeModal();" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--bg-card-2); border:1px solid var(--glass-border); border-radius:14px; color:white; cursor:pointer; text-align:right; font-family:Cairo; transition:all 0.2s;">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(102,126,234,0.15);color:var(--grad-1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📄</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;">تقرير نصي مقروء (Text)</div>
+              <div style="font-size:11px;color:var(--text-muted);">ملخص مكتوب واضح ومناسب للمشاركة على الواتساب</div>
+            </div>
+          </button>
+
+          <!-- Backup JSON -->
+          <button onclick="exportToJson(); closeModal();" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--bg-card-2); border:1px solid var(--glass-border); border-radius:14px; color:white; cursor:pointer; text-align:right; font-family:Cairo; transition:all 0.2s;">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,192,72,0.15);color:var(--warning);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💾</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;">نسخة احتياطية كاملة (JSON)</div>
+              <div style="font-size:11px;color:var(--text-muted);">لحفظ واسترجاع البيانات عبر زر الاستيراد 📥</div>
+            </div>
+          </button>
+        </div>
+
+        <div class="modal-btns" style="margin-top:20px;">
+          <button class="cancel" onclick="closeModal()">إلغاء</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalContainer').innerHTML = html;
+}
+
+function exportToExcel() {
+  const cur = D.settings.currency;
+  const mp = D.payments[curMonth] || {};
+  const paidMembers = D.members.filter(m => mp[m.id]?.paid);
+  const totalCollected = paidMembers.reduce((s, m) => (mp[m.id]?.amount || 0) + s, 0);
+  const totalExpected = D.members.reduce((s, m) => s + m.amount, 0);
+
+  // UTF-8 BOM for Arabic in Excel
+  let csv = '\uFEFF';
+  csv += `تقرير ${D.settings.fundName} - شهر ${monthLabel(curMonth)}\n`;
+  csv += `تاريخ التقرير,${new Date().toLocaleDateString('ar-EG')}\n`;
+  csv += `المُحصّل هذا الشهر,${totalCollected} ${cur}\n`;
+  csv += `المطلوب تحصيله,${totalExpected} ${cur}\n`;
+  csv += `المتبقي,${totalExpected - totalCollected} ${cur}\n`;
+  csv += `نسبة التحصيل,${totalExpected > 0 ? Math.round((totalCollected/totalExpected)*100) : 0}%\n\n`;
+
+  csv += "م,اسم العضو,المبلغ الشهري,حالة السداد,المبلغ المدفوع,تاريخ السداد,ملاحظات\n";
+  D.members.forEach((m, idx) => {
+    const p = mp[m.id];
+    const isPaid = p?.paid;
+    const status = isPaid ? "تم السداد" : "لم يسدد";
+    const amountPaid = isPaid ? p.amount : 0;
+    const date = isPaid ? new Date(p.date).toLocaleDateString('ar-EG') : "-";
+    const note = p?.note ? `"${p.note.replace(/"/g, '""')}"` : "-";
+    csv += `${idx + 1},"${m.name}",${m.amount} ${cur},${status},${amountPaid} ${cur},${date},${note}\n`;
+  });
+
+  const b = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(b);
-  a.download = `صندوق_العيلة_${curMonth}.json`;
+  a.download = `تقرير_${D.settings.fundName}_${curMonth}.csv`;
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('📤 تم تصدير البيانات', 'success');
+  toast('📊 تم تصدير ملف الإكسيل بنجاح', 'success');
+}
+
+function exportToText() {
+  const cur = D.settings.currency;
+  const mp = D.payments[curMonth] || {};
+  const paidMembers = D.members.filter(m => mp[m.id]?.paid);
+  const unpaidMembers = D.members.filter(m => !mp[m.id]?.paid);
+  const totalCollected = paidMembers.reduce((s, m) => (mp[m.id]?.amount || 0) + s, 0);
+  const totalExpected = D.members.reduce((s, m) => s + m.amount, 0);
+
+  let txt = `========================================\n`;
+  txt += `        تقرير ${D.settings.fundName}\n`;
+  txt += `        شهر: ${monthLabel(curMonth)}\n`;
+  txt += `========================================\n\n`;
+  txt += `📅 تاريخ الاستخراج: ${new Date().toLocaleDateString('ar-EG')} (${new Date().toLocaleTimeString('ar-EG')})\n`;
+  txt += `💰 إجمالي المحصل: ${totalCollected.toLocaleString('ar-EG')} ${cur}\n`;
+  txt += `🎯 المطلوب تحصيله: ${totalExpected.toLocaleString('ar-EG')} ${cur}\n`;
+  txt += `⏳ المتبقي: ${(totalExpected - totalCollected).toLocaleString('ar-EG')} ${cur}\n`;
+  txt += `📈 نسبة التحصيل: ${totalExpected > 0 ? Math.round((totalCollected/totalExpected)*100) : 0}%\n`;
+  txt += `👥 عدد المسددين: ${paidMembers.length} من ${D.members.length}\n\n`;
+
+  txt += `----------------------------------------\n`;
+  txt += `✅ قائمة من قاموا بالسداد (${paidMembers.length}):\n`;
+  txt += `----------------------------------------\n`;
+  if (paidMembers.length === 0) {
+    txt += `(لا توجد مدفوعات مسجلة بعد لهذا الشهر)\n`;
+  } else {
+    paidMembers.forEach((m, idx) => {
+      const p = mp[m.id];
+      const d = new Date(p.date).toLocaleDateString('ar-EG');
+      txt += `${idx + 1}. ${m.name} - دفع: ${p.amount} ${cur} (بتاريخ: ${d})${p.note ? ' [' + p.note + ']' : ''}\n`;
+    });
+  }
+
+  txt += `\n----------------------------------------\n`;
+  txt += `⏳ قائمة من لم يسددوا (${unpaidMembers.length}):\n`;
+  txt += `----------------------------------------\n`;
+  if (unpaidMembers.length === 0) {
+    txt += `(تم سداد جميع الأعضاء بالكامل! 🎉)\n`;
+  } else {
+    unpaidMembers.forEach((m, idx) => {
+      txt += `${idx + 1}. ${m.name} - المطلوب: ${m.amount} ${cur}\n`;
+    });
+  }
+
+  txt += `\n========================================\n`;
+  txt += `تم الاستخراج عبر تطبيق صندوق العيلة\n`;
+
+  const b = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = `تقرير_${D.settings.fundName}_${curMonth}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('📄 تم تصدير التقرير النصي المقروء', 'success');
+}
+
+function exportToJson() {
+  const b = new Blob([JSON.stringify(D, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = `نسخة_احتياطية_${D.settings.fundName}_${curMonth}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('💾 تم تصدير النسخة الاحتياطية', 'success');
 }
 
 function importData(ev) {
