@@ -1444,11 +1444,25 @@ function defaults() {
   };
 }
 
-let D = (() => { try { const r = localStorage.getItem(STORAGE); return r ? JSON.parse(r) : defaults(); } catch(e) { return defaults(); } })();
-if (!D.pendingPayments) D.pendingPayments = [];
-if (!D.settings.adminPin) D.settings.adminPin = '1234';
-if (!D.settings.fundRoom) D.settings.fundRoom = 'family_main';
-if (!D.settings.cloudUrl) D.settings.cloudUrl = DEFAULT_FIREBASE_URL;
+function ensureDataIntegrity(obj) {
+  if (!obj) obj = defaults();
+  if (!obj.settings) obj.settings = {};
+  if (!obj.settings.fundName) obj.settings.fundName = 'صندوق العيلة';
+  if (!obj.settings.defaultAmount) obj.settings.defaultAmount = 200;
+  if (!obj.settings.currency) obj.settings.currency = 'ج.م';
+  if (!obj.settings.vfNumber) obj.settings.vfNumber = '';
+  if (!obj.settings.adminPin) obj.settings.adminPin = getAdminPin();
+  if (!obj.settings.cloudUrl) obj.settings.cloudUrl = DEFAULT_FIREBASE_URL;
+  if (!obj.settings.fundRoom) obj.settings.fundRoom = 'family_main';
+  
+  if (!Array.isArray(obj.members)) obj.members = [];
+  if (!obj.payments || typeof obj.payments !== 'object' || Array.isArray(obj.payments)) obj.payments = {};
+  if (!Array.isArray(obj.pendingPayments)) obj.pendingPayments = [];
+  if (!Array.isArray(obj.history)) obj.history = [];
+  return obj;
+}
+
+let D = ensureDataIntegrity((() => { try { const r = localStorage.getItem(STORAGE); return r ? JSON.parse(r) : defaults(); } catch(e) { return defaults(); } })());
 
 // Check URL query parameters for auto-configuration from shared link
 const urlParams = new URLSearchParams(window.location.search);
@@ -1542,12 +1556,13 @@ async function pushToCloud() {
 }
 
 function applyRemoteData(remoteData, silent = false) {
-  if (!remoteData || !remoteData.members) return;
-  const curCloud = D.settings.cloudUrl;
-  const curRoom = D.settings.fundRoom;
+  if (!remoteData) return;
+  remoteData = ensureDataIntegrity(remoteData);
+
+  const curCloud = D.settings?.cloudUrl || DEFAULT_FIREBASE_URL;
+  const curRoom = D.settings?.fundRoom || 'family_main';
   const curPin = getAdminPin();
 
-  if (!remoteData.settings) remoteData.settings = {};
   if (!remoteData.settings.cloudUrl) remoteData.settings.cloudUrl = curCloud;
   if (!remoteData.settings.fundRoom) remoteData.settings.fundRoom = curRoom;
   if (!remoteData.settings.adminPin) remoteData.settings.adminPin = curPin;
@@ -1882,6 +1897,7 @@ function updateTabsVisibility() {
 
 // ===================== RENDER =====================
 function renderAll() {
+  ensureDataIntegrity(D);
   document.getElementById('headerDate').textContent = monthLabel(curMonth);
   renderRoleBadge();
   renderVfBanner();
@@ -1893,10 +1909,11 @@ function renderAll() {
   renderHistory();
   renderSettings();
   updateTabsVisibility();
+  updateSyncStatus(D.settings?.cloudUrl ? 'online' : 'local');
 }
 
 function renderVfBanner() {
-  const vf = D.settings.vfNumber;
+  const vf = D.settings?.vfNumber;
   const b = document.getElementById('vfBanner');
   if (vf) {
     b.style.display = '';
@@ -1907,13 +1924,14 @@ function renderVfBanner() {
 }
 
 function renderStats() {
+  if (!D.payments) D.payments = {};
   const mp = D.payments[curMonth] || {};
-  const totalExp = D.members.reduce((s,m) => s + m.amount, 0);
-  const paid = D.members.filter(m => mp[m.id]?.paid);
+  const totalExp = (D.members || []).reduce((s,m) => s + (m.amount || D.settings?.defaultAmount || 200), 0);
+  const paid = (D.members || []).filter(m => mp[m.id]?.paid);
   const totalCol = paid.reduce((s,m) => (mp[m.id]?.amount||0) + s, 0);
   let allTime = 0;
-  Object.values(D.payments).forEach(p => Object.values(p).forEach(v => { if(v.paid) allTime += (v.amount||0); }));
-  const cur = D.settings.currency;
+  Object.values(D.payments || {}).forEach(p => Object.values(p || {}).forEach(v => { if(v?.paid) allTime += (v.amount||0); }));
+  const cur = D.settings?.currency || 'ج.م';
 
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card">
@@ -1928,7 +1946,7 @@ function renderStats() {
     </div>
     <div class="stat-card">
       <span class="stat-icon">✅</span>
-      <div class="stat-value">${paid.length} / ${D.members.length}</div>
+      <div class="stat-value">${paid.length} / ${(D.members || []).length}</div>
       <div class="stat-label">قاموا بالسداد</div>
     </div>
     <div class="stat-card">
@@ -1940,9 +1958,10 @@ function renderStats() {
 }
 
 function renderProgress() {
+  if (!D.payments) D.payments = {};
   const mp = D.payments[curMonth] || {};
-  const totalExp = D.members.reduce((s,m) => s + m.amount, 0);
-  const paid = D.members.filter(m => mp[m.id]?.paid);
+  const totalExp = (D.members || []).reduce((s,m) => s + (m.amount || D.settings?.defaultAmount || 200), 0);
+  const paid = (D.members || []).filter(m => mp[m.id]?.paid);
   const totalCol = paid.reduce((s,m) => (mp[m.id]?.amount||0) + s, 0);
   const pct = totalExp > 0 ? Math.round((totalCol/totalExp)*100) : 0;
   const circumference = 2 * Math.PI * 40;
@@ -1982,6 +2001,9 @@ function setMemberFilter(val) {
 }
 
 function renderMembers() {
+  if (!D.payments) D.payments = {};
+  if (!Array.isArray(D.pendingPayments)) D.pendingPayments = [];
+  if (!Array.isArray(D.members)) D.members = [];
   const mp = D.payments[curMonth] || {};
   const pending = D.pendingPayments.filter(p => p.month === curMonth);
   let html = '';
@@ -2135,7 +2157,8 @@ function renderMembers() {
 }
 
 function renderChart() {
-  const cur = D.settings.currency;
+  if (!D.payments) D.payments = {};
+  const cur = D.settings?.currency || 'ج.م';
   const now = new Date();
   const months = [];
   for (let i = 5; i >= 0; i--) {
@@ -2221,6 +2244,7 @@ function renderChart() {
 }
 
 function renderHistory() {
+  if (!Array.isArray(D.history)) D.history = [];
   const icons = { payment:'payment', cancel_payment:'cancel', add_member:'add', remove_member:'remove', vf_pending:'vf-confirm', vf_approved:'vf-confirm', vf_rejected:'cancel' };
   const labels = { payment:'💵 سداد', cancel_payment:'↩️ إلغاء سداد', add_member:'➕ إضافة عضو', remove_member:'🗑️ حذف عضو', vf_pending:'📱 طلب سداد', vf_approved:'✅ موافقة على سداد', vf_rejected:'❌ رفض طلب سداد' };
   const cur = D.settings.currency;
@@ -2811,7 +2835,7 @@ initRealtimeSync();
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=11')
+    navigator.serviceWorker.register('sw.js?v=12')
       .then(reg => {
         reg.update();
         console.log('SW registered:', reg.scope);
