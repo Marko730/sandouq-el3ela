@@ -1424,15 +1424,17 @@ const AR_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو
 const AVATARS = ['🧔','👩','👨','👵','👴','🧑','👦','👧','🧓','👱','👸','🤴','👳','🧕','💁','🙋'];
 const COLORS = ['#667eea','#00c9a7','#ff6b6b','#ffc048','#00d2ff','#764ba2','#f093fb','#ff9a00','#00e5a0','#36d1dc','#5b86e5','#fc5c7d'];
 
+const DEFAULT_FIREBASE_URL = 'https://sandouq-el3ela-default-rtdb.firebaseio.com';
+
 function defaults() {
   return {
     settings: {
       fundName: 'صندوق العيلة',
-      defaultAmount: 100,
+      defaultAmount: 200,
       currency: 'ج.م',
       vfNumber: '',
       adminPin: '1234',
-      cloudUrl: '',
+      cloudUrl: DEFAULT_FIREBASE_URL,
       fundRoom: 'family_main'
     },
     members: [],
@@ -1446,7 +1448,7 @@ let D = (() => { try { const r = localStorage.getItem(STORAGE); return r ? JSON.
 if (!D.pendingPayments) D.pendingPayments = [];
 if (!D.settings.adminPin) D.settings.adminPin = '1234';
 if (!D.settings.fundRoom) D.settings.fundRoom = 'family_main';
-if (D.settings.cloudUrl === undefined) D.settings.cloudUrl = '';
+if (!D.settings.cloudUrl) D.settings.cloudUrl = DEFAULT_FIREBASE_URL;
 
 // Check URL query parameters for auto-configuration from shared link
 const urlParams = new URLSearchParams(window.location.search);
@@ -2809,7 +2811,7 @@ initRealtimeSync();
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=10')
+    navigator.serviceWorker.register('sw.js?v=11')
       .then(reg => {
         reg.update();
         console.log('SW registered:', reg.scope);
