@@ -170,7 +170,9 @@
 
     .header-actions {
       display: flex;
+      align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .btn-icon {
@@ -1076,12 +1078,24 @@
     }
 
     @media (max-width: 768px) {
+      .header { padding: 10px 14px; }
+      .header-inner { flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+      .header-actions { gap: 6px; justify-content: flex-end; }
+      .btn-icon { width: 34px; height: 34px; font-size: 15px; border-radius: 9px; }
+      .role-badge-btn { padding: 5px 10px; font-size: 11px; }
+      .sync-badge { padding: 5px 10px; font-size: 11px; }
       .charts-row { grid-template-columns: 1fr; }
       .vf-banner-content { flex-direction: column; text-align: center; }
       .progress-section { flex-direction: column; text-align: center; }
       .member-card { flex-wrap: wrap; }
       .unified-content { flex-direction: column; text-align: center; }
       .unified-controls { justify-content: center; width: 100%; }
+    }
+
+    @media (max-width: 480px) {
+      .header-inner { flex-direction: column; align-items: stretch; gap: 10px; }
+      .header-inner .logo { justify-content: center; }
+      .header-actions { justify-content: center; width: 100%; }
     }
 
     /* ===== ROLE SWITCHER & UNIFIED CARD ===== */
@@ -1964,8 +1978,12 @@ function renderStats() {
     </div>
     <div class="stat-card">
       <span class="stat-icon">✅</span>
-      <div class="stat-value">${paid.length} / ${(D.members || []).length}</div>
-      <div class="stat-label">قاموا بالسداد</div>
+      <div class="stat-value" style="direction:ltr; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+        <span style="color:var(--success); font-weight:900;">${paid.length}</span>
+        <span style="color:var(--text-muted); font-size:18px;">/</span>
+        <span style="color:var(--text-main); font-weight:700;">${(D.members || []).length}</span>
+      </div>
+      <div class="stat-label">${paid.length} سددوا من إجمالي ${(D.members || []).length}</div>
     </div>
     <div class="stat-card">
       <span class="stat-icon">🏦</span>
@@ -2853,7 +2871,7 @@ initRealtimeSync();
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=13')
+    navigator.serviceWorker.register('sw.js?v=14')
       .then(reg => {
         reg.update();
         console.log('SW registered:', reg.scope);
