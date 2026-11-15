@@ -1505,6 +1505,25 @@ async function pushToCloud() {
   }
 }
 
+function applyRemoteData(remoteData, silent = false) {
+  if (!remoteData || !remoteData.members) return;
+  const curCloud = D.settings.cloudUrl;
+  const curRoom = D.settings.fundRoom;
+  const curPin = getAdminPin();
+
+  if (!remoteData.settings) remoteData.settings = {};
+  if (!remoteData.settings.cloudUrl) remoteData.settings.cloudUrl = curCloud;
+  if (!remoteData.settings.fundRoom) remoteData.settings.fundRoom = curRoom;
+  if (!remoteData.settings.adminPin) remoteData.settings.adminPin = curPin;
+
+  if (JSON.stringify(remoteData) !== JSON.stringify(D)) {
+    D = remoteData;
+    localStorage.setItem(STORAGE, JSON.stringify(D));
+    renderAll();
+    if (!silent) toast('🔄 تم تحديث البيانات فورياً من السحابة', 'info');
+  }
+}
+
 async function pullFromCloud(silent = false) {
   const endpoint = getSyncEndpoint();
   if (!endpoint) {
@@ -1515,14 +1534,7 @@ async function pullFromCloud(silent = false) {
     const res = await fetch(endpoint);
     if (res.ok) {
       const remoteData = await res.json();
-      if (remoteData && remoteData.members) {
-        if (JSON.stringify(remoteData) !== JSON.stringify(D)) {
-          D = remoteData;
-          localStorage.setItem(STORAGE, JSON.stringify(D));
-          renderAll();
-          if (!silent) toast('🔄 تم تحديث البيانات فورياً من السحابة', 'info');
-        }
-      }
+      applyRemoteData(remoteData, silent);
       updateSyncStatus('online');
     } else {
       updateSyncStatus('offline');
@@ -1554,12 +1566,7 @@ function initRealtimeSync() {
         try {
           const msg = JSON.parse(e.data);
           if (msg && msg.path === '/' && msg.data && msg.data.members) {
-            if (JSON.stringify(msg.data) !== JSON.stringify(D)) {
-              D = msg.data;
-              localStorage.setItem(STORAGE, JSON.stringify(D));
-              renderAll();
-              toast('🔔 تم تحديث الصندوق لحظياً بواسطة المدير!', 'success');
-            }
+            applyRemoteData(msg.data, false);
           } else {
             pullFromCloud(true);
           }
@@ -2297,15 +2304,23 @@ function saveSettings() {
   }
   D.settings.currency = document.getElementById('setCurrency').value;
   D.settings.vfNumber = document.getElementById('setVfNumber').value.trim();
+  
   const newPin = (document.getElementById('setAdminPin')?.value || '').trim() || '1234';
   setAdminPin(newPin);
-  D.settings.cloudUrl = document.getElementById('setCloudUrl').value.trim();
-  D.settings.fundRoom = document.getElementById('setFundRoom').value.trim() || 'family_main';
+  
+  let cloudUrlVal = (document.getElementById('setCloudUrl')?.value || '').trim();
+  if (cloudUrlVal && !cloudUrlVal.startsWith('http://') && !cloudUrlVal.startsWith('https://')) {
+    cloudUrlVal = 'https://' + cloudUrlVal;
+  }
+  cloudUrlVal = cloudUrlVal.replace(/\/+$/, '').replace(/\.json$/, '');
+  D.settings.cloudUrl = cloudUrlVal;
+  D.settings.fundRoom = (document.getElementById('setFundRoom')?.value || '').trim() || 'family_main';
+  
   save();
   initRealtimeSync();
   renderAll();
   document.getElementById('headerTitle').textContent = D.settings.fundName;
-  toast('✅ تم حفظ الإعدادات وربط المزامنة السحابية', 'success');
+  toast('✅ تم حفظ الإعدادات ورمز المرور ورابط المزامنة بنجاح!', 'success');
 }
 
 // ===================== ACTIONS =====================
@@ -2480,15 +2495,7 @@ function rejectPending(idx) {
   toast(`❌ تم رفض طلب سداد ${m?.name}`, 'error');
 }
 
-function saveSettings() {
-  D.settings.fundName = document.getElementById('setName').value.trim() || 'صندوق العيلة';
-  D.settings.defaultAmount = parseFloat(document.getElementById('setAmount').value) || 100;
-  D.settings.currency = document.getElementById('setCurrency').value;
-  D.settings.vfNumber = document.getElementById('setVfNumber').value.trim();
-  save(); renderAll();
-  document.getElementById('headerTitle').textContent = D.settings.fundName;
-  toast('✅ تم حفظ الإعدادات', 'success');
-}
+
 
 function confirmReset() {
   if (!confirm('⚠️ مسح جميع البيانات نهائياً؟')) return;
@@ -2695,7 +2702,7 @@ initRealtimeSync();
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=7')
+    navigator.serviceWorker.register('sw.js?v=8')
       .then(reg => {
         reg.update();
         console.log('SW registered:', reg.scope);
