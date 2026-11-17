@@ -1381,9 +1381,12 @@
           <p>حوّل المبلغ الشهري على الرقم أدناه، ثم اضغط "أرسلت الفلوس" بجوار اسمك، وهيتسجل تلقائي بعد موافقة المسؤول</p>
         </div>
         <div class="vf-number-box">
-          <div class="label">رقم فودافون كاش</div>
+          <div class="label">رقم / رابط فودافون كاش</div>
           <div class="vf-number" id="vfNumber">—</div>
-          <button class="vf-copy-btn" onclick="copyVfNumber()">📋 نسخ الرقم</button>
+          <div style="display:flex; gap:6px; margin-top:8px; justify-content:center; flex-wrap:wrap;">
+            <button class="vf-copy-btn" onclick="copyVfNumber()">📋 نسخ الرقم</button>
+            <button class="vf-copy-btn" style="background:#fff; color:#e60000; font-weight:800;" onclick="payViaVodafoneCash()">💳 فتح محفظة فودافون كاش</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1439,6 +1442,7 @@ const AVATARS = ['🧔','👩','👨','👵','👴','🧑','👦','👧','🧓',
 const COLORS = ['#667eea','#00c9a7','#ff6b6b','#ffc048','#00d2ff','#764ba2','#f093fb','#ff9a00','#00e5a0','#36d1dc','#5b86e5','#fc5c7d'];
 
 const DEFAULT_FIREBASE_URL = 'https://sandouq-el3ela-default-rtdb.firebaseio.com';
+const VF_CASH_LINK = 'http://vf.eg/vfcash?id=mt&qrId=rvyriU';
 
 function defaults() {
   return {
@@ -1447,6 +1451,7 @@ function defaults() {
       defaultAmount: 200,
       currency: 'ج.م',
       vfNumber: '',
+      vfLink: VF_CASH_LINK,
       adminPin: '1234',
       cloudUrl: DEFAULT_FIREBASE_URL,
       fundRoom: 'family_main'
@@ -1465,6 +1470,7 @@ function ensureDataIntegrity(obj) {
   if (!obj.settings.defaultAmount) obj.settings.defaultAmount = 200;
   if (!obj.settings.currency) obj.settings.currency = 'ج.م';
   if (!obj.settings.vfNumber) obj.settings.vfNumber = '';
+  if (!obj.settings.vfLink) obj.settings.vfLink = VF_CASH_LINK;
   if (!obj.settings.adminPin) obj.settings.adminPin = getAdminPin();
   if (!obj.settings.cloudUrl) obj.settings.cloudUrl = DEFAULT_FIREBASE_URL;
   if (!obj.settings.fundRoom) obj.settings.fundRoom = 'family_main';
@@ -1946,10 +1952,11 @@ function renderAll() {
 
 function renderVfBanner() {
   const vf = D.settings?.vfNumber;
+  const link = D.settings?.vfLink || VF_CASH_LINK;
   const b = document.getElementById('vfBanner');
-  if (vf) {
+  if (vf || link) {
     b.style.display = '';
-    document.getElementById('vfNumber').textContent = vf;
+    document.getElementById('vfNumber').textContent = vf || 'رابط محفظة فودافون كاش المباشر';
   } else {
     b.style.display = 'none';
   }
@@ -2161,7 +2168,7 @@ function renderMembers() {
               ? ''
               : hasPending
                 ? '<span style="font-size:11px; color:var(--warning); font-weight:700;">طلبك قيد المراجعة ⏳</span>'
-                : `<button class="btn-action" style="width:auto; padding:0 12px; font-size:11px; gap:4px; font-weight:700;" onclick="sendPendingPayment('${m.id}')" title="إشعار للمدير بالتحويل">📱 أرسلت فودافون كاش</button>`
+                : `<button class="btn-action btn-pay-vf" style="width:auto; padding:6px 18px; font-size:12px; gap:6px; font-weight:800; background:linear-gradient(135deg, #e60000, #ff3838); color:#fff; border-radius:10px; border:none; box-shadow:0 3px 12px rgba(230,0,0,0.35); cursor:pointer;" onclick="payViaVodafoneCash('${m.id}')" title="فتح رابط محفظة فودافون كاش للسداد">💳 سداد</button>`
             }
           </div>
         `;
@@ -2342,6 +2349,10 @@ function renderSettings() {
         <label class="form-label" style="color:var(--vodafone-red);">📱 رقم فودافون كاش</label>
         <input class="form-input" id="setVfNumber" placeholder="مثال: 01012345678" value="${D.settings.vfNumber||''}" style="direction:ltr; text-align:center; font-size:18px; letter-spacing:2px;">
         <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">أدخل رقم فودافون كاش لاستقبال المدفوعات. سيظهر في بانر أعلى الصفحة.</p>
+
+        <label class="form-label" style="color:var(--vodafone-red); margin-top:12px;">🔗 رابط محفظة فودافون كاش (رابط السداد المباشر)</label>
+        <input class="form-input" id="setVfLink" placeholder="http://vf.eg/vfcash?..." value="${D.settings.vfLink||VF_CASH_LINK}" style="direction:ltr; text-align:left; font-family:monospace; font-size:12px;">
+        <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">الرابط الذي يفتح للعضو تلقائياً عند الضغط على زر "سداد".</p>
       </div>
       <div class="form-group" style="padding-top:16px; border-top:1px solid var(--glass-border);">
         <label class="form-label" style="color:var(--warning); font-size:14px; font-weight:800;">🔐 رمز مرور لوحة المدير (PIN)</label>
@@ -2458,6 +2469,7 @@ async function saveSettings() {
   }
   D.settings.currency = document.getElementById('setCurrency').value;
   D.settings.vfNumber = document.getElementById('setVfNumber').value.trim();
+  D.settings.vfLink = (document.getElementById('setVfLink')?.value || '').trim() || VF_CASH_LINK;
   
   const newPin = (document.getElementById('setAdminPin')?.value || '').trim() || '1234';
   setAdminPin(newPin);
@@ -2627,6 +2639,19 @@ function removeMember(id) {
   D.history.unshift({ date:new Date().toISOString(), action:'remove_member', member:m.name, month:curMonth });
   save(); renderAll();
   toast(`🗑️ تم حذف ${m.name}`, 'error');
+}
+
+// Vodafone Cash Payment & Notification
+function payViaVodafoneCash(memberId) {
+  const link = (D.settings && D.settings.vfLink) || VF_CASH_LINK;
+  try {
+    window.open(link, '_blank');
+  } catch (e) {
+    window.location.href = link;
+  }
+  if (memberId) {
+    sendPendingPayment(memberId);
+  }
 }
 
 // Vodafone Cash - pending payment simulation
@@ -2871,7 +2896,7 @@ initRealtimeSync();
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=14')
+    navigator.serviceWorker.register('sw.js?v=15')
       .then(reg => {
         reg.update();
         console.log('SW registered:', reg.scope);
