@@ -2120,6 +2120,11 @@ function renderMembers() {
     listToDisplay = D.members.filter(m => mp[m.id]?.paid);
   } else if (currentMemberFilter === 'unpaid') {
     listToDisplay = D.members.filter(m => !mp[m.id]?.paid);
+  } else {
+    // "عرض الكل": المسددين يظهروا أولاً ثم الذين لم يسددوا
+    const paidList = D.members.filter(m => mp[m.id]?.paid);
+    const unpaidList = D.members.filter(m => !mp[m.id]?.paid);
+    listToDisplay = [...paidList, ...unpaidList];
   }
 
   if (listToDisplay.length === 0) {
@@ -2138,6 +2143,8 @@ function renderMembers() {
   } else {
     html += '<div class="members-grid">';
     listToDisplay.forEach((m, i) => {
+      const origIdx = D.members.findIndex(x => x.id === m.id);
+      const mi = origIdx >= 0 ? origIdx : i;
       const pay = mp[m.id];
       const isPaid = pay?.paid;
       const hasPending = D.pendingPayments.some(p => p.memberId === m.id && p.month === curMonth);
@@ -2176,8 +2183,8 @@ function renderMembers() {
 
       html += `
         <div class="member-card slide-in" style="animation-delay:${i*0.06}s">
-          <div class="member-avatar" style="background: linear-gradient(135deg, ${memberColor(i)}, ${memberColor(i+3)})">
-            ${memberAvatar(i)}
+          <div class="member-avatar" style="background: linear-gradient(135deg, ${memberColor(mi)}, ${memberColor(mi+3)})">
+            ${memberAvatar(mi)}
           </div>
           <div class="member-info">
             <div class="member-name">${m.name}</div>
@@ -2896,7 +2903,7 @@ initRealtimeSync();
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=15')
+    navigator.serviceWorker.register('sw.js?v=16')
       .then(reg => {
         reg.update();
         console.log('SW registered:', reg.scope);
